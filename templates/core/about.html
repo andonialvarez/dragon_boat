@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Acerca de" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="layout-article">
+    <article>
+      <h1>{% translate "Acerca de esta web" %}</h1>
+      <div class="prose">
+        <p>{% blocktranslate %}{{ SITE_NAME }} es un punto de encuentro para la gente del dragon boat: palistas, tamborileros, timoneles, clubes, organizadores y aficionados. Aquí encontrarás noticias, el calendario de regatas, las clasificaciones de los campeonatos y un foro para hablar de todo ello.{% endblocktranslate %}</p>
+        <p>{% blocktranslate %}Aunque el dragon boat es el protagonista, también hay sitio para las traineras, el piragüismo, el remo olímpico, la va'a y el resto de deportes de remo y pala.{% endblocktranslate %}</p>
+        <h2>{% translate "¿Quién publica?" %}</h2>
+        <p>{% blocktranslate %}Cualquier persona con cuenta puede publicar noticias y eventos, comentar y escribir en el foro. Además, la web recoge automáticamente titulares de otros medios (siempre con enlace a la noticia original) y publica resúmenes elaborados con inteligencia artificial que citan su fuente. Cada noticia indica claramente su origen.{% endblocktranslate %}</p>
+      </div>
+    </article>
+    <aside class="stack">
+      <section class="panel">
+        <h3>{% translate "Participa" %}</h3>
+        <ul class="plain-list">
+          <li><a href="{% url 'article_create' %}">📰 {% translate "Publicar noticia" %}</a></li>
+          <li><a href="{% url 'event_create' %}">📅 {% translate "Publicar evento" %}</a></li>
+          <li><a href="{% url 'forum:index' %}">💬 {% translate "Ir al foro" %}</a></li>
+          <li><a href="{% url 'rules' %}">📜 {% translate "Normas de la comunidad" %}</a></li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</div>
+{% endblock %}

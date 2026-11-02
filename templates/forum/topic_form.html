@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Nuevo tema" %} · {{ category.name }}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card wide">
+    <nav class="breadcrumbs"><a href="{% url 'forum:index' %}">{% translate "Foro" %}</a> / <a href="{{ category.get_absolute_url }}">{{ category.name }}</a></nav>
+    <h1>{% translate "Nuevo tema" %}</h1>
+    <p class="muted">{% translate "Un buen título ayuda a que te respondan antes. Recuerda las normas: respeto ante todo." %}</p>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      {% for field in form %}{% include "includes/field.html" %}{% endfor %}
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% translate "Publicar tema" %}</button>
+        <a href="{{ category.get_absolute_url }}">{% translate "Cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

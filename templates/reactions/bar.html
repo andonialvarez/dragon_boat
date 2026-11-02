@@ -1,0 +1,16 @@
+{% load i18n %}
+<div class="reaction-bar{% if compact %} compact{% endif %}">
+  {% for r in reactions %}
+    <form class="reaction-form" action="{% url 'toggle_reaction' target obj.pk r.kind %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <button class="reaction-btn" type="submit" data-kind="{{ r.kind }}" data-count="{{ r.count }}"
+              aria-pressed="{% if r.mine %}true{% else %}false{% endif %}"
+              title="{{ r.label }}{% if not user.is_authenticated %} · {% translate 'Inicia sesión para reaccionar' %}{% endif %}">
+        <span class="emoji" aria-hidden="true">{{ r.emoji }}</span>
+        <span class="visually-hidden">{{ r.label }}</span>
+        <span class="count">{% if r.count %}{{ r.count }}{% endif %}</span>
+      </button>
+    </form>
+  {% endfor %}
+</div>

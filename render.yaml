@@ -1,0 +1,31 @@
+# Plano de despliegue para Render (https://render.com).
+# En Render: New > Blueprint > elige este repositorio. Crea la web y la base de datos.
+databases:
+  - name: dragonboat-db
+    databaseName: dragonboat
+    user: dragonboat
+    plan: free
+
+services:
+  - type: web
+    name: dragonboat
+    runtime: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application
+    healthCheckPath: /robots.txt
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dragonboat-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: NEWS_API_TOKEN
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 2
+      - key: COMMUNITY_REQUIRES_APPROVAL
+        value: "false"

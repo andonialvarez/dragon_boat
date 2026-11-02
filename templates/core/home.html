@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static i18n humanize site_tags %}
+
+{% block title %}{% translate "Dragon boat, traineras, piragüismo y remo" %}{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <h1>{% translate "Todo el" %} <em>{% translate "dragon boat" %}</em>, {% translate "a un golpe de pala" %}</h1>
+      <p class="lead">{% translate "Noticias, calendario de regatas, clasificaciones y un foro para la comunidad. También traineras, piragüismo, remo y va'a." %}</p>
+      <div class="actions">
+        <a class="btn btn-light" href="{% url 'event_list' %}">{% translate "Próximas regatas" %}</a>
+        <a class="btn btn-ghost-light" href="{% url 'forum:index' %}">{% translate "Entrar al foro" %}</a>
+      </div>
+      <ul class="hero-stats">
+        <li><strong>{{ stats.events }}</strong><span>{% translate "eventos próximos" %}</span></li>
+        <li><strong>{{ stats.championships }}</strong><span>{% translate "campeonatos" %}</span></li>
+        <li><strong>{{ stats.teams }}</strong><span>{% translate "equipos y clubes" %}</span></li>
+      </ul>
+    </div>
+    <div class="hero-art">
+      <img src="{% static 'img/dragon-boat.svg' %}" alt="{% translate 'Ilustración de un barco dragón con palistas, tamborilero y timonel' %}" width="660" height="260">
+    </div>
+  </div>
+  <svg class="hero-waves" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 46 V24 Q75 4 150 24 T300 24 T450 24 T600 24 T750 24 T900 24 T1050 24 T1200 24 V46 Z" style="fill: var(--bg)"/>
+  </svg>
+</section>
+
+<div class="wrap">
+  <section class="section" aria-labelledby="titulo-noticias">
+    <div class="section-head">
+      <h2 id="titulo-noticias">{% translate "Últimas noticias" %}</h2>
+      <a href="{% url 'article_list' %}">{% translate "Todas las noticias" %} →</a>
+    </div>
+    {% if lead %}
+      <article class="card lead-story">
+        {% include "includes/sample_badge.html" with obj=lead corner=True %}
+        {% include "includes/media.html" with image=lead.cover_image sport=lead.sport alt=lead.title %}
+        <div class="card-body">
+          <div class="badges">
+            {% if lead.sport %}<span class="chip" style="--sport: {{ lead.sport.color }}">{{ lead.sport.icon }} {{ lead.sport.name }}</span>{% endif %}
+            <span class="badge">{{ lead.get_category_display }}</span>
+          </div>
+          <h3 class="card-title"><a class="card-link" href="{{ lead.get_absolute_url }}">{{ lead.title }}</a></h3>
+          <p>{{ lead.summary }}</p>
+          <div class="meta">
+            <time datetime="{{ lead.published_at|date:'c' }}">{{ lead.published_at|date:"j \d\e F \d\e Y" }}</time>
+            {% if lead.comment_count %}<span>💬 {{ lead.comment_count }} {% translate "comentarios" %}</span>{% endif %}
+          </div>
+        </div>
+      </article>
+      {% if latest %}
+        <div class="grid grid-3" style="margin-top:22px">
+          {% for article in latest %}{% include "includes/article_card.html" %}{% endfor %}
+        </div>
+      {% endif %}
+    {% else %}
+      {% translate "Todavía no hay noticias publicadas." as msg %}
+      {% include "includes/empty.html" with message=msg icon="📰" %}
+    {% endif %}
+  </section>
+
+  <div class="layout-2 section">
+    <section aria-labelledby="titulo-eventos">
+      <div class="section-head">
+        <h2 id="titulo-eventos">{% translate "Próximos eventos" %}</h2>
+        <a href="{% url 'event_list' %}">{% translate "Calendario completo" %} →</a>
+      </div>
+      {% if upcoming_events %}
+        <ul class="event-list">
+          {% for event in upcoming_events %}{% include "includes/event_row.html" %}{% endfor %}
+        </ul>
+      {% else %}
+        {% translate "No hay eventos programados por ahora." as msg %}
+        {% include "includes/empty.html" with message=msg icon="📅" %}
+      {% endif %}
+    </section>
+
+    <aside class="stack" aria-label="{% translate 'Clasificación y foro' %}">
+      <section class="panel" aria-labelledby="titulo-clasificacion">
+        <h3 id="titulo-clasificacion">🏆 {% translate "Clasificación" %}</h3>
+        {% if featured_championship and featured_division %}
+          <p class="small muted mb-0">
+            <a href="{{ featured_championship.get_absolute_url }}"><strong>{{ featured_championship.name }}</strong></a>
+            {% include "includes/sample_badge.html" with obj=featured_championship %}
+          </p>
+          <p class="small muted">{{ featured_division.name }}</p>
+          <table class="standings">
+            <thead><tr><th>#</th><th>{% translate "Equipo" %}</th><th class="num">{% if featured_division.standings.all.0.points is not None %}{% translate "Pts" %}{% else %}{% translate "Tiempo" %}{% endif %}</th></tr></thead>
+            <tbody>
+              {% for row in featured_division.standings.all|slice:":5" %}
+                <tr>
+                  <td><span class="pos pos-{{ row.position }}">{{ row.position }}</span></td>
+                  <td class="team-name"><a href="{{ row.team.get_absolute_url }}">{{ row.team.display_short_name }}</a><span class="origin">{{ row.team.city }}</span></td>
+                  <td class="num">{% if row.points is not None %}{{ row.points|floatformat:"-2" }}{% else %}{{ row.result_time|default:"—" }}{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <p class="small mb-0" style="margin-top:10px"><a href="{{ featured_championship.get_absolute_url }}">{% translate "Ver clasificación completa" %} →</a></p>
+        {% else %}
+          <p class="muted mb-0">{% translate "Aún no hay clasificaciones publicadas." %}</p>
+        {% endif %}
+      </section>
+
+      <section class="panel" aria-labelledby="titulo-foro">
+        <h3 id="titulo-foro">💬 {% translate "En el foro" %}</h3>
+        {% if recent_topics %}
+          <ul class="plain-list">
+            {% for topic in recent_topics %}
+              <li>
+                <a href="{{ topic.get_absolute_url }}"><strong>{{ topic.title }}</strong></a>
+                {% include "includes/sample_badge.html" with obj=topic %}
+                <div class="small muted">{{ topic.category.name }} · {% blocktranslate count counter=topic.reply_count %}{{ counter }} respuesta{% plural %}{{ counter }} respuestas{% endblocktranslate %} · {{ topic.last_activity_at|naturaltime }}</div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">{% translate "El foro está esperando su primer tema." %}</p>
+        {% endif %}
+        <p class="small mb-0" style="margin-top:12px"><a href="{% url 'forum:index' %}">{% translate "Ir al foro" %} →</a></p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="section" aria-labelledby="titulo-deportes">
+    <div class="section-head">
+      <h2 id="titulo-deportes">{% translate "Deportes de remo y pala" %}</h2>
+      <a href="{% url 'sport_list' %}">{% translate "Conoce cada deporte" %} →</a>
+    </div>
+    <div class="sport-strip">
+      {% for sport in sports %}
+        <a class="sport-tile{% if sport.is_primary %} primary{% endif %}" href="{{ sport.get_absolute_url }}" style="--sport: {{ sport.color }}">
+          <span class="icon" aria-hidden="true">{{ sport.icon }}</span>
+          <span>{{ sport.name }}<small>{% if sport.is_primary %}{% translate "Deporte principal" %}{% else %}{{ sport.get_propulsion_display }}{% endif %}</small></span>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if not user.is_authenticated %}
+    <section class="section">
+      <div class="login-cta">
+        <p><strong>{% translate "¿Remas, palas o animas desde el muelle?" %}</strong> {% translate "Crea una cuenta gratis para comentar noticias, reaccionar y participar en el foro." %}</p>
+        <a class="btn btn-primary" href="{% url 'signup' %}">{% translate "Crear cuenta" %}</a>
+        <a class="btn btn-secondary" href="{% url 'login' %}">{% translate "Ya tengo cuenta" %}</a>
+      </div>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

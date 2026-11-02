@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Noticias" %}{% if current_sport %} · {{ current_sport.name }}{% endif %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="page-head with-action">
+    <div>
+      <h1>{% translate "Noticias" %}{% if current_sport %} <span class="muted">· {{ current_sport.name }}</span>{% endif %}</h1>
+      <p>{% translate "Actualidad del dragon boat y del resto de deportes de remo y pala: competiciones, clubes, técnica y comunidad." %}</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'article_create' %}">＋ {% translate "Publicar noticia" %}</a>
+  </header>
+
+  <nav class="filters" aria-label="{% translate 'Filtrar por deporte' %}">
+    <a href="{% url 'article_list' %}{% if current_category %}?seccion={{ current_category }}{% endif %}" {% if not current_sport %}class="active"{% endif %}>{% translate "Todos" %}</a>
+    {% for sport in nav_sports %}
+      <a href="?deporte={{ sport.slug }}{% if current_category %}&amp;seccion={{ current_category }}{% endif %}" {% if current_sport == sport %}class="active"{% endif %}>{{ sport.icon }} {{ sport.name }}</a>
+    {% endfor %}
+  </nav>
+  <nav class="filters" aria-label="{% translate 'Filtrar por sección' %}">
+    <a href="?{% if current_sport %}deporte={{ current_sport.slug }}{% endif %}" {% if not current_category %}class="active"{% endif %}>{% translate "Todas las secciones" %}</a>
+    {% for value, label in categories %}
+      <a href="?seccion={{ value }}{% if current_sport %}&amp;deporte={{ current_sport.slug }}{% endif %}" {% if current_category == value %}class="active"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+  <form class="search-inline list-search" method="get" role="search">
+    {% if current_sport %}<input type="hidden" name="deporte" value="{{ current_sport.slug }}">{% endif %}
+    {% if current_category %}<input type="hidden" name="seccion" value="{{ current_category }}">{% endif %}
+    <label class="visually-hidden" for="buscar-noticias">{% translate "Buscar en noticias" %}</label>
+    <input id="buscar-noticias" type="search" name="q" value="{{ query }}" placeholder="{% translate 'Buscar en noticias…' %}">
+  </form>
+
+  {% if articles %}
+    <div class="grid grid-3">
+      {% for article in articles %}{% include "includes/article_card.html" %}{% endfor %}
+    </div>
+    {% include "includes/pagination.html" %}
+  {% else %}
+    {% translate "No hay noticias con estos filtros." as msg %}
+    {% include "includes/empty.html" with message=msg icon="📰" %}
+  {% endif %}
+</div>
+{% endblock %}

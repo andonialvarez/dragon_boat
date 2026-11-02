@@ -1,0 +1,54 @@
+{% load i18n humanize site_tags reactions_tags %}
+<li class="comment" id="comentario-{{ comment.pk }}">
+  {% avatar comment.author %}
+  <div class="comment-body">
+    <div class="comment-head">
+      <a class="author" href="{% url 'profile_detail' comment.author.get_username %}">{{ comment.author.get_username }}</a>
+      {% if comment.author_id == article.author_id %}<span class="badge">{% translate "Autor" %}</span>{% endif %}
+      {% include "includes/sample_badge.html" with obj=comment %}
+      <time datetime="{{ comment.created_at|date:'c' }}" title="{{ comment.created_at|date:'j M Y, H:i' }}">{{ comment.created_at|naturaltime }}</time>
+      {% if comment.is_visible and comment.was_edited %}<span class="small muted">· {% translate "editado" %}</span>{% endif %}
+    </div>
+
+    {% if comment.is_hidden %}
+      <div class="comment-text removed">{% translate "Comentario retirado por moderación." %}</div>
+    {% elif comment.is_deleted %}
+      <div class="comment-text removed">{% translate "Comentario borrado por su autor." %}</div>
+    {% else %}
+      <div class="comment-text">{{ comment.body|urlize|linebreaks }}</div>
+      <div class="comment-actions">
+        {% reaction_bar comment compact=True %}
+        {% if article.allow_comments %}
+          {% if user.is_authenticated %}
+            <button type="button" class="link-button" data-reply-to="{{ comment.pk }}" aria-expanded="false" aria-controls="responder-{{ comment.pk }}">{% translate "Responder" %}</button>
+          {% else %}
+            <a href="{% url 'login' %}?next={{ article.get_absolute_url|urlencode }}%23comentario-{{ comment.pk }}">{% translate "Responder" %}</a>
+          {% endif %}
+        {% endif %}
+        {% if user.is_authenticated and user.pk == comment.author_id %}
+          <a href="{% url 'comment_edit' comment.pk %}">{% translate "Editar" %}</a>
+          <a href="{% url 'comment_delete' comment.pk %}">{% translate "Borrar" %}</a>
+        {% endif %}
+      </div>
+      {% if user.is_authenticated and article.allow_comments %}
+        <form class="reply-form" id="responder-{{ comment.pk }}" action="{% url 'comment_add' article.slug %}" method="post" hidden>
+          {% csrf_token %}
+          <input type="hidden" name="parent_id" value="{{ comment.pk }}">
+          <label class="visually-hidden" for="respuesta-{{ comment.pk }}">{% translate "Tu respuesta" %}</label>
+          <textarea id="respuesta-{{ comment.pk }}" name="body" rows="2" maxlength="3000" required placeholder="{% blocktranslate with name=comment.author.get_username %}Responder a {{ name }}…{% endblocktranslate %}"></textarea>
+          <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">{% translate "Publicar respuesta" %}</button></div>
+        </form>
+      {% endif %}
+    {% endif %}
+
+    {% if not is_reply and comment.replies.all %}
+      <ul class="replies">
+        {% for reply in comment.replies.all %}
+          {% if reply.is_visible or not reply.is_deleted %}
+            {% include "news/_comment.html" with comment=reply is_reply=True %}
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</li>

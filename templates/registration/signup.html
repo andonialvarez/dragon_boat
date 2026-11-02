@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Crear cuenta" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card">
+    <h1>{% translate "Crear cuenta" %}</h1>
+    <p class="muted">{% translate "Con una cuenta puedes comentar noticias, reaccionar, publicar noticias y eventos y participar en el foro. Leer la web no requiere cuenta." %}</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      {% for field in form %}
+        {% if field.name == "website" %}
+          <div class="hp-field" aria-hidden="true"><label for="{{ field.id_for_label }}">Web</label>{{ field }}</div>
+        {% else %}
+          {% include "includes/field.html" %}
+        {% endif %}
+      {% endfor %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="form-actions"><button class="btn btn-primary" type="submit">{% translate "Crear cuenta" %}</button></div>
+    </form>
+    <p class="auth-alt">{% translate "¿Ya tienes cuenta?" %} <a href="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% translate "Entra" %}</a></p>
+  </div>
+</div>
+{% endblock %}

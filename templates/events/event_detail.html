@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n site_tags %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block description %}{{ event.summary|default:event.description|truncatewords:30 }}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="layout-article">
+    <article>
+      <nav class="breadcrumbs"><a href="{% url 'event_list' %}">{% translate "Eventos" %}</a> / <a href="{% url 'event_list' %}?deporte={{ event.sport.slug }}">{{ event.sport.name }}</a></nav>
+      <div class="badges" style="margin-bottom:10px">
+        {% include "includes/sample_badge.html" with obj=event %}
+        <span class="chip" style="--sport: {{ event.sport.color }}">{{ event.sport.icon }} {{ event.sport.name }}</span>
+        <span class="badge">{{ event.get_kind_display }}</span>
+        {% if event.status != "programado" %}<span class="badge badge-red">{{ event.get_status_display }}</span>{% elif event.is_past %}<span class="badge badge-muted">{% translate "Celebrado" %}</span>{% endif %}
+      </div>
+      <h1>{{ event.title }}</h1>
+      {% if event.summary %}<p class="summary" style="font-size:1.15rem; color: var(--ink-soft)">{{ event.summary }}</p>{% endif %}
+      {% if not event.is_published %}<p class="notice warn">{% translate "Este evento está pendiente de revisión: solo lo ves tú y el equipo de la web." %}</p>{% endif %}
+      {% if can_manage %}
+        <p class="notice">✏️ {% translate "Puedes modificar este evento." %}
+          <a href="{% url 'event_edit' event.slug %}">{% translate "Editar" %}</a> ·
+          <a href="{% url 'event_delete' event.slug %}">{% translate "Borrar" %}</a>
+        </p>
+      {% endif %}
+      {% if event.created_by and not event.created_by.is_staff %}<p class="small muted">{% translate "Publicado por" %} <a href="{% url 'profile_detail' event.created_by.get_username %}">{{ event.created_by.get_username }}</a></p>{% endif %}
+
+      {% if event.cover_image %}
+        <figure class="article-figure">{% include "includes/media.html" with image=event.cover_image sport=event.sport alt=event.title %}</figure>
+      {% endif %}
+
+      {% if event.description %}<div class="prose">{{ event.description|urlize|linebreaks }}</div>{% endif %}
+
+      {% if participants %}
+        <section class="section" aria-labelledby="t-inscritos">
+          <div class="section-head"><h2 id="t-inscritos">{% blocktranslate count counter=participants|length %}{{ counter }} equipo inscrito{% plural %}{{ counter }} equipos inscritos{% endblocktranslate %}</h2></div>
+          <div class="grid">{% for team in participants %}{% include "includes/team_card.html" %}{% endfor %}</div>
+        </section>
+      {% endif %}
+
+      {% if articles %}
+        <section class="section" aria-labelledby="t-noticias">
+          <div class="section-head"><h2 id="t-noticias">{% translate "Noticias del evento" %}</h2></div>
+          <div class="grid">{% for article in articles %}{% include "includes/article_card.html" %}{% endfor %}</div>
+        </section>
+      {% endif %}
+    </article>
+
+    <aside class="stack">
+      <section class="panel">
+        <h3>{% translate "Datos del evento" %}</h3>
+        <dl class="facts">
+          <dt>{% translate "Fecha" %}</dt><dd>{% date_range event.start_date event.end_date %}{% if event.start_time %}, {{ event.start_time|time:"H:i" }}{% endif %}</dd>
+          {% if event.place %}<dt>{% translate "Lugar" %}</dt><dd>{{ event.place }}{% if event.country and event.country != "España" %} ({{ event.country }}){% endif %}</dd>{% endif %}
+          {% if event.distances %}<dt>{% translate "Distancias" %}</dt><dd>{{ event.distances }}</dd>{% endif %}
+          {% if event.organizer %}<dt>{% translate "Organiza" %}</dt><dd>{{ event.organizer }}</dd>{% endif %}
+          {% if event.championship %}<dt>{% translate "Campeonato" %}</dt><dd><a href="{{ event.championship.get_absolute_url }}">{{ event.championship.name }}</a></dd>{% endif %}
+          {% if event.registration_deadline %}<dt>{% translate "Inscripción hasta" %}</dt><dd>{{ event.registration_deadline|date:"j \d\e F" }}</dd>{% endif %}
+        </dl>
+        <div class="form-actions" style="margin-top:16px">
+          {% if event.registration_open %}<a class="btn btn-primary btn-small" href="{{ event.registration_url }}" target="_blank" rel="noopener">{% translate "Inscribirse" %}</a>{% endif %}
+          {% if not event.is_past %}<a class="btn btn-secondary btn-small" href="{% url 'event_ics' event.slug %}">📅 {% translate "Añadir al calendario" %}</a>{% endif %}
+        </div>
+        <ul class="plain-list small" style="margin-top:14px">
+          {% if event.map_url %}<li><a href="{{ event.map_url }}" target="_blank" rel="noopener">🗺️ {% translate "Ver en el mapa" %}</a></li>{% endif %}
+          {% if event.website %}<li><a href="{{ event.website }}" target="_blank" rel="noopener">🔗 {{ event.website|hostname }}</a></li>{% endif %}
+        </ul>
+      </section>
+
+      {% if more_events %}
+        <section class="panel">
+          <h3>{% blocktranslate with sport=event.sport.name %}Más eventos de {{ sport }}{% endblocktranslate %}</h3>
+          <ul class="event-list event-compact">{% for event in more_events %}{% include "includes/event_row.html" with compact=True %}{% endfor %}</ul>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

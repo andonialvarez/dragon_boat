@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Normas de la comunidad" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <article class="form-card wide" style="max-width:780px">
+    <h1>📜 {% translate "Normas de la comunidad" %}</h1>
+    <p class="muted">{% translate "Como en un barco: si no remamos todos a una, no avanzamos." %}</p>
+    <div class="prose">
+      <ol>
+        <li><strong>{% translate "Respeto." %}</strong> {% translate "Nada de insultos, acoso, discriminación ni ataques personales. Se puede discrepar sin faltar." %}</li>
+        <li><strong>{% translate "Contenido del tema." %}</strong> {% translate "Publica en la sección adecuada y mantén las conversaciones sobre deportes de remo y pala." %}</li>
+        <li><strong>{% translate "Noticias honestas." %}</strong> {% translate "Publica información verdadera. Si viene de otro medio, resúmela con tus palabras y enlaza la fuente: no copies textos completos." %}</li>
+        <li><strong>{% translate "Fotos con permiso." %}</strong> {% translate "Sube solo imágenes propias o que tengas permiso para usar. Cuidado con fotos de menores." %}</li>
+        <li><strong>{% translate "Nada de spam." %}</strong> {% translate "La publicidad está permitida solo si es útil para la comunidad (material, cursos, regatas) y sin abusar." %}</li>
+        <li><strong>{% translate "Datos personales." %}</strong> {% translate "No publiques datos personales de otras personas (teléfonos, direcciones, etc.)." %}</li>
+      </ol>
+      <p>{% translate "El equipo de la web puede ocultar contenidos o cerrar cuentas que no respeten estas normas." %}</p>
+    </div>
+  </article>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{# Imagen si la hay; si no, un marcador con el color e icono del deporte. #}
+<div class="media" {% if sport %}style="--sport: {{ sport.color }}"{% endif %}>
+  {% if image %}
+    <img src="{{ image.url }}" alt="{{ alt }}" loading="lazy">
+  {% else %}
+    <div class="media-placeholder" aria-hidden="true">{{ sport.icon|default:"🐉" }}</div>
+  {% endif %}
+</div>

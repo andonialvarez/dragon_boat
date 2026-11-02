@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Equipos y clubes" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="page-head">
+    <h1>{% translate "Equipos y clubes" %}</h1>
+    <p>{% translate "Quién compite, de dónde viene y qué le hace especial." %}</p>
+  </header>
+  <nav class="filters" aria-label="{% translate 'Filtrar por deporte' %}">
+    <a href="?{% if query %}q={{ query|urlencode }}{% endif %}" {% if not current_sport %}class="active"{% endif %}>{% translate "Todos" %}</a>
+    {% for sport in nav_sports %}
+      <a href="?deporte={{ sport.slug }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" {% if current_sport == sport %}class="active"{% endif %}>{{ sport.icon }} {{ sport.name }}</a>
+    {% endfor %}
+  </nav>
+  <form class="search-inline list-search" method="get" role="search">
+    {% if current_sport %}<input type="hidden" name="deporte" value="{{ current_sport.slug }}">{% endif %}
+    <label class="visually-hidden" for="buscar-equipos">{% translate "Buscar equipo o localidad" %}</label>
+    <input id="buscar-equipos" type="search" name="q" value="{{ query }}" placeholder="{% translate 'Equipo o localidad…' %}">
+  </form>
+  {% if teams %}
+    <div class="grid">{% for team in teams %}{% include "includes/team_card.html" with show_description=True %}{% endfor %}</div>
+    {% include "includes/pagination.html" %}
+  {% else %}
+    {% translate "No hay equipos con estos filtros." as msg %}
+    {% include "includes/empty.html" with message=msg icon="🛶" %}
+  {% endif %}
+</div>
+{% endblock %}

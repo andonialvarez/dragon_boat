@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if show_past %}{% translate "Eventos pasados" %}{% else %}{% translate "Próximos eventos y regatas" %}{% endif %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="page-head with-action">
+    <div>
+      <h1>{% if show_past %}{% translate "Eventos pasados" %}{% else %}{% translate "Próximos eventos y regatas" %}{% endif %}</h1>
+      <p>{% translate "Regatas, jornadas de liga, campeonatos, festivales y cursos. Puedes descargar cada evento para tu calendario." %}</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'event_create' %}">＋ {% translate "Publicar evento" %}</a>
+  </header>
+
+  <nav class="filters" aria-label="{% translate 'Cuándo' %}">
+    <a href="?{% if current_sport %}deporte={{ current_sport.slug }}{% endif %}" {% if not show_past %}class="active"{% endif %}>{% translate "Próximos" %}</a>
+    <a href="?ver=pasados{% if current_sport %}&amp;deporte={{ current_sport.slug }}{% endif %}" {% if show_past %}class="active"{% endif %}>{% translate "Pasados" %}</a>
+  </nav>
+  <nav class="filters" aria-label="{% translate 'Filtrar por deporte' %}">
+    <a href="?{% if show_past %}ver=pasados{% endif %}" {% if not current_sport %}class="active"{% endif %}>{% translate "Todos los deportes" %}</a>
+    {% for sport in nav_sports %}
+      <a href="?deporte={{ sport.slug }}{% if show_past %}&amp;ver=pasados{% endif %}" {% if current_sport == sport %}class="active"{% endif %}>{{ sport.icon }} {{ sport.name }}</a>
+    {% endfor %}
+  </nav>
+
+  {% if events %}
+    {% regroup events by start_date|date:"F Y" as months %}
+    {% for month in months %}
+      <section class="section" style="padding-top:0">
+        <h2 style="text-transform: capitalize">{{ month.grouper }}</h2>
+        <ul class="event-list">
+          {% for event in month.list %}{% include "includes/event_row.html" %}{% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+    {% include "includes/pagination.html" %}
+  {% else %}
+    {% if show_past %}{% translate "No hay eventos pasados con estos filtros." as msg %}{% else %}{% translate "No hay eventos programados con estos filtros." as msg %}{% endif %}
+    {% include "includes/empty.html" with message=msg icon="📅" %}
+  {% endif %}
+</div>
+{% endblock %}

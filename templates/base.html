@@ -1,0 +1,130 @@
+{% load static i18n site_tags %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITE_TAGLINE }}{% endblock %} · {{ SITE_NAME }}</title>
+  <meta name="description" content="{% block description %}{{ SITE_TAGLINE }}{% endblock %}">
+  <meta name="theme-color" content="#0c2035">
+  <meta property="og:site_name" content="{{ SITE_NAME }}">
+  <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ SITE_TAGLINE }}{% endblock %}">
+  {% block og_image %}{% endblock %}
+  <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
+  <link rel="alternate" type="application/rss+xml" title="{{ SITE_NAME }} · {% translate 'Noticias' %}" href="{% url 'article_feed' %}">
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#contenido">{% translate "Saltar al contenido" %}</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="{% url 'home' %}">
+        <img src="{% static 'img/logo.svg' %}" alt="" width="38" height="38">
+        <span>{{ SITE_NAME }}<small>{% translate "remo y pala" %}</small></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">☰ {% translate "Menú" %}</button>
+      <nav class="main-nav" id="menu-principal" aria-label="{% translate 'Principal' %}">
+        <a href="{% url 'article_list' %}" {% nav_current '/noticias/' %}>{% translate "Noticias" %}</a>
+        <a href="{% url 'event_list' %}" {% nav_current '/eventos/' %}>{% translate "Eventos" %}</a>
+        <a href="{% url 'championship_list' %}" {% nav_current '/campeonatos/' %}>{% translate "Clasificaciones" %}</a>
+        <a href="{% url 'team_list' %}" {% nav_current '/equipos/' %}>{% translate "Equipos" %}</a>
+        <a href="{% url 'sport_list' %}" {% nav_current '/deportes/' %}>{% translate "Deportes" %}</a>
+        <a href="{% url 'forum:index' %}" {% nav_current '/foro/' %}>{% translate "Foro" %}</a>
+      </nav>
+      <div class="header-actions">
+        <a class="search-link" href="{% url 'search' %}" title="{% translate 'Buscar' %}" aria-label="{% translate 'Buscar' %}">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </a>
+        <form class="header-search" action="{% url 'search' %}" method="get" role="search">
+          <label class="visually-hidden" for="buscar-cabecera">{% translate "Buscar" %}</label>
+          <input id="buscar-cabecera" type="search" name="q" placeholder="{% translate 'Buscar…' %}" value="{{ request.GET.q|default:'' }}">
+        </form>
+        {% if user.is_authenticated %}
+          <details class="user-menu">
+            <summary>{% avatar user "small" %} <span>{{ user.get_username }}</span></summary>
+            <div class="menu">
+              <a href="{% url 'profile_detail' user.get_username %}">{% translate "Mi perfil" %}</a>
+              <a href="{% url 'article_create' %}">📰 {% translate "Publicar noticia" %}</a>
+              <a href="{% url 'event_create' %}">📅 {% translate "Publicar evento" %}</a>
+              <a href="{% url 'profile_edit' %}">{% translate "Editar perfil" %}</a>
+              <a href="{% url 'password_change' %}">{% translate "Cambiar contraseña" %}</a>
+              {% if user.is_staff %}<a href="{% url 'admin:index' %}">{% translate "Panel de administración" %}</a>{% endif %}
+              <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit">{% translate "Cerrar sesión" %}</button></form>
+            </div>
+          </details>
+        {% else %}
+          <a class="btn btn-ghost-light btn-small" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">{% translate "Entrar" %}</a>
+          <a class="btn btn-primary btn-small" href="{% url 'signup' %}?next={{ request.get_full_path|urlencode }}">{% translate "Crear cuenta" %}</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% if has_sample_data %}
+    <div class="sample-banner" role="note">
+      <div class="wrap">
+        <strong>{% translate "Web en preparación." %}</strong>
+        {% translate "Los contenidos marcados como" %} <span class="badge badge-sample">{% translate "Ejemplo" %}</span>
+        {% translate "son ficticios: equipos, resultados y noticias inventados solo para enseñar cómo queda la web." %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if messages %}
+    <div class="wrap">
+      <ul class="messages">
+        {% for message in messages %}<li class="message {{ message.tags }}" role="status">{{ message }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <main id="contenido">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <svg class="waves" viewBox="0 0 1200 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 34 V18 Q75 0 150 18 T300 18 T450 18 T600 18 T750 18 T900 18 T1050 18 T1200 18 V34 Z" fill="#0c2035"/></svg>
+    <div class="wrap">
+      <div class="about">
+        <h2>{{ SITE_NAME }}</h2>
+        <p>{% translate "Noticias, regatas, clasificaciones y comunidad del dragon boat, con un hueco para las traineras, el piragüismo y el resto de deportes de remo y pala." %}</p>
+      </div>
+      <div>
+        <h2>{% translate "Competición" %}</h2>
+        <ul>
+          <li><a href="{% url 'event_list' %}">{% translate "Calendario de eventos" %}</a></li>
+          <li><a href="{% url 'championship_list' %}">{% translate "Clasificaciones" %}</a></li>
+          <li><a href="{% url 'team_list' %}">{% translate "Equipos y clubes" %}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>{% translate "Comunidad" %}</h2>
+        <ul>
+          <li><a href="{% url 'forum:index' %}">{% translate "Foro" %}</a></li>
+          <li><a href="{% url 'rules' %}">{% translate "Normas" %}</a></li>
+          <li><a href="{% url 'article_feed' %}">RSS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>{% translate "La web" %}</h2>
+        <ul>
+          <li><a href="{% url 'about' %}">{% translate "Acerca de" %}</a></li>
+          <li><a href="{% url 'privacy' %}">{% translate "Privacidad" %}</a></li>
+          {% if user.is_staff %}<li><a href="{% url 'admin:index' %}">{% translate "Panel de administración" %}</a></li>{% endif %}
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <div class="wrap">
+        <span>© {{ current_year }} {{ SITE_NAME }}</span>
+        <span>{% translate "Hecho con pasión por el agua" %} 🐉</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/site.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

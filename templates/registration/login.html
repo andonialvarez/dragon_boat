@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Entrar" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card">
+    <h1>{% translate "Entrar" %}</h1>
+    <p class="muted">{% translate "Inicia sesión para comentar, reaccionar, publicar y participar en el foro." %}</p>
+    <form method="post">
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      {% for field in form %}{% include "includes/field.html" %}{% endfor %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% translate "Entrar" %}</button>
+        <a href="{% url 'password_reset' %}">{% translate "¿Has olvidado la contraseña?" %}</a>
+      </div>
+    </form>
+    <p class="auth-alt">{% translate "¿Aún no tienes cuenta?" %} <a href="{% url 'signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% translate "Crea una gratis" %}</a></p>
+  </div>
+</div>
+{% endblock %}

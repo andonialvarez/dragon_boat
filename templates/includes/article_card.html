@@ -1,0 +1,18 @@
+{% load i18n %}
+<article class="card">
+  {% include "includes/sample_badge.html" with obj=article corner=True %}
+  {% include "includes/media.html" with image=article.cover_image sport=article.sport alt=article.title %}
+  <div class="card-body">
+    <div class="badges">
+      {% if article.sport %}<span class="chip" style="--sport: {{ article.sport.color }}">{{ article.sport.icon }} {{ article.sport.name }}</span>{% endif %}
+      <span class="badge">{{ article.get_category_display }}</span>
+      {% if article.origin != "redaccion" %}<span class="badge origin-badge {{ article.origin }}">{% if article.origin == "importada" %}{% blocktranslate with source=article.source_name %}Vía {{ source }}{% endblocktranslate %}{% else %}{{ article.get_origin_display }}{% endif %}</span>{% endif %}
+    </div>
+    <h3 class="card-title"><a class="card-link" href="{{ article.get_absolute_url }}">{{ article.title }}</a></h3>
+    <p>{{ article.summary|truncatewords:30 }}</p>
+    <div class="meta">
+      <time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j M Y"|lower }}</time>
+      {% if article.comment_count %}<span>💬 {{ article.comment_count }}</span>{% endif %}
+    </div>
+  </div>
+</article>

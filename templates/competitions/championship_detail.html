@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n site_tags %}
+{% block title %}{{ championship.name }}{% endblock %}
+{% block description %}{{ championship.description|truncatewords:30 }}{% endblock %}
+{% block content %}
+<section class="sport-hero" style="--sport: {{ championship.sport.color }}">
+  <div class="wrap">
+    <nav class="breadcrumbs"><a href="{% url 'championship_list' %}">{% translate "Clasificaciones" %}</a> / <a href="{% url 'championship_list' %}?deporte={{ championship.sport.slug }}">{{ championship.sport.name }}</a></nav>
+    <div class="badges" style="margin-bottom:10px">
+      {% include "includes/sample_badge.html" with obj=championship %}
+      <span class="badge">{{ championship.get_scope_display }}</span>
+      <span class="badge">{% translate "Temporada" %} {{ championship.season }}</span>
+      {% if championship.status_label %}<span class="badge">{{ championship.status_label }}</span>{% endif %}
+    </div>
+    <h1><span aria-hidden="true">🏆</span> {{ championship.name }}</h1>
+    {% if championship.description %}<p>{{ championship.description|truncatewords:60 }}</p>{% endif %}
+  </div>
+</section>
+
+<div class="wrap page">
+  <div class="layout-article">
+    <div class="stack">
+      {% if championship.is_sample %}<p class="sample-note">⚠️ {% translate "Campeonato de ejemplo: los equipos y resultados son ficticios." %}</p>{% endif %}
+      <h2>{% translate "Clasificación" %}</h2>
+      {% for division in championship.divisions.all %}
+        {% include "competitions/_standings_table.html" %}
+      {% empty %}
+        {% translate "La clasificación se publicará cuando haya resultados." as msg %}
+        {% include "includes/empty.html" with message=msg icon="⏳" %}
+      {% endfor %}
+
+      {% if teams %}
+        <section aria-labelledby="t-participantes">
+          <div class="section-head" style="margin-top:20px"><h2 id="t-participantes">{% translate "Equipos participantes" %}</h2></div>
+          <div class="grid">{% for team in teams %}{% include "includes/team_card.html" with show_description=True %}{% endfor %}</div>
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="stack">
+      <section class="panel">
+        <h3>{% translate "Ficha" %}</h3>
+        <dl class="facts">
+          <dt>{% translate "Deporte" %}</dt><dd><a href="{{ championship.sport.get_absolute_url }}">{{ championship.sport.name }}</a></dd>
+          <dt>{% translate "Ámbito" %}</dt><dd>{{ championship.get_scope_display }}</dd>
+          {% if championship.start_date %}<dt>{% translate "Fechas" %}</dt><dd>{% date_range championship.start_date championship.end_date %}</dd>{% endif %}
+          {% if championship.location %}<dt>{% translate "Sedes" %}</dt><dd>{{ championship.location }}</dd>{% endif %}
+          {% if championship.organizer %}<dt>{% translate "Organiza" %}</dt><dd>{{ championship.organizer }}</dd>{% endif %}
+        </dl>
+      </section>
+      {% if events %}
+        <section class="panel">
+          <h3>📅 {% translate "Pruebas y jornadas" %}</h3>
+          <ul class="event-list event-compact">{% for event in events %}{% include "includes/event_row.html" with compact=True %}{% endfor %}</ul>
+        </section>
+      {% endif %}
+      {% if articles %}
+        <section class="panel">
+          <h3>📰 {% translate "Noticias" %}</h3>
+          <ul class="plain-list">{% for item in articles %}<li><a href="{{ item.get_absolute_url }}">{{ item.title }}</a><div class="small muted">{{ item.published_at|date:"j M Y"|lower }}</div></li>{% endfor %}</ul>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

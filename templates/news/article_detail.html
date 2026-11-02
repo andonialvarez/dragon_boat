@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load i18n humanize site_tags reactions_tags %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block description %}{{ article.summary }}{% endblock %}
+{% block og_title %}{{ article.title }}{% endblock %}
+{% block og_description %}{{ article.summary }}{% endblock %}
+{% block og_image %}{% if article.cover_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ article.cover_image.url }}">{% endif %}{% endblock %}
+
+{% block content %}
+<div class="wrap page">
+  <div class="layout-article">
+    <article>
+      <header class="article-header">
+        <nav class="breadcrumbs"><a href="{% url 'article_list' %}">{% translate "Noticias" %}</a>{% if article.sport %} / <a href="{% url 'article_list' %}?deporte={{ article.sport.slug }}">{{ article.sport.name }}</a>{% endif %}</nav>
+        <div class="badges" style="margin-bottom:10px">
+          {% include "includes/sample_badge.html" with obj=article %}
+          {% if article.sport %}<span class="chip" style="--sport: {{ article.sport.color }}">{{ article.sport.icon }} {{ article.sport.name }}</span>{% endif %}
+          <span class="badge">{{ article.get_category_display }}</span>
+          {% if article.origin != "redaccion" %}<span class="badge origin-badge {{ article.origin }}">{{ article.get_origin_display }}</span>{% endif %}
+          {% if article.status == "pendiente" %}<span class="badge badge-red">{% translate "Pendiente de revisión" %}</span>{% elif not article.is_published %}<span class="badge badge-red">{% translate "Borrador" %}</span>{% endif %}
+        </div>
+        <h1>{{ article.title }}</h1>
+        <p class="summary">{{ article.summary }}</p>
+        <div class="meta">
+          <time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j \d\e F \d\e Y, H:i" }}</time>
+          {% if article.author %}<span>{% translate "Por" %} <a href="{% url 'profile_detail' article.author.get_username %}">{{ article.author.get_full_name|default:article.author.get_username }}</a></span>{% elif article.source_name %}<span>{% blocktranslate with source=article.source_name %}Vía {{ source }}{% endblocktranslate %}</span>{% endif %}
+          <span>⏱ {% blocktranslate count counter=article.reading_minutes %}{{ counter }} min de lectura{% plural %}{{ counter }} min de lectura{% endblocktranslate %}</span>
+          <a href="#comentarios">💬 {{ comment_count }}</a>
+        </div>
+      </header>
+
+      {% if can_manage %}
+        <p class="notice">✏️ {% translate "Puedes modificar esta noticia." %}
+          <a href="{% url 'article_edit' article.slug %}">{% translate "Editar" %}</a> ·
+          <a href="{% url 'article_delete' article.slug %}">{% translate "Borrar" %}</a>
+        </p>
+      {% endif %}
+      {% if article.status == "pendiente" %}
+        <p class="notice warn">{% translate "Esta noticia está pendiente de revisión: solo la ves tú y el equipo de la web." %}</p>
+      {% endif %}
+      {% if article.cover_image and not article.is_external %}
+        <figure class="article-figure">
+          {% include "includes/media.html" with image=article.cover_image sport=article.sport alt=article.image_caption|default:article.title %}
+          {% if article.image_caption %}<figcaption>{{ article.image_caption }}</figcaption>{% endif %}
+        </figure>
+      {% endif %}
+
+      {% if article.is_sample %}
+        <p class="sample-note">⚠️ {% translate "Noticia de ejemplo: los equipos, personas y resultados que aparecen son ficticios." %}</p>
+      {% endif %}
+
+      {% if article.is_external %}
+        <div class="external-cta">
+          <p>{% blocktranslate with source=article.source_name %}Esta es una noticia de {{ source }}. Aquí solo mostramos el titular y un resumen: la noticia completa está en su web.{% endblocktranslate %}</p>
+          <a class="btn btn-primary" href="{{ article.source_url }}" target="_blank" rel="noopener">{% translate "Leer la noticia completa" %} ↗</a>
+        </div>
+      {% else %}
+        <div class="prose">{{ article.body|urlize|linebreaks }}</div>
+        {% if article.origin == "ia" %}
+          <p class="small muted">🤖 {% translate "Resumen elaborado automáticamente con IA a partir de la fuente citada. Si ves un error, avísanos en el foro." %}</p>
+        {% endif %}
+      {% endif %}
+
+      {% if not article.is_external and article.source_name or not article.is_external and article.source_url %}
+        <p class="source">{% translate "Fuente:" %}
+          {% if article.source_url %}<a href="{{ article.source_url }}" rel="noopener" target="_blank">{{ article.source_name|default:article.source_url|hostname }}</a>{% else %}{{ article.source_name }}{% endif %}
+        </p>
+      {% endif %}
+
+      {% if article.is_published %}
+        <div id="reacciones" style="margin-top:22px">
+          <p class="small muted" style="margin-bottom:6px">{% translate "¿Qué te ha parecido?" %}</p>
+          {% reaction_bar article %}
+          {% if not user.is_authenticated %}<p class="reaction-hint" style="margin-top:6px">{% translate "Inicia sesión para reaccionar." %}</p>{% endif %}
+        </div>
+      {% endif %}
+
+      <section class="comments" id="comentarios" aria-labelledby="titulo-comentarios">
+        <h2 id="titulo-comentarios">{% blocktranslate count counter=comment_count %}{{ counter }} comentario{% plural %}{{ counter }} comentarios{% endblocktranslate %}</h2>
+
+        {% if article.allow_comments and article.is_published %}
+          {% if user.is_authenticated %}
+            <form class="panel" action="{% url 'comment_add' article.slug %}" method="post" style="margin-bottom:24px">
+              {% csrf_token %}
+              <div style="display:flex; gap:12px; align-items:flex-start">
+                {% avatar user %}
+                <div style="flex:1">
+                  {% include "includes/field.html" with field=comment_form.body %}
+                  <div class="form-actions"><button class="btn btn-primary" type="submit">{% translate "Publicar comentario" %}</button></div>
+                </div>
+              </div>
+            </form>
+          {% else %}
+            <div class="login-cta" style="margin-bottom:24px">
+              <p>{% translate "Para comentar, responder o reaccionar necesitas una cuenta. Leer es libre." %}</p>
+              <a class="btn btn-primary btn-small" href="{% url 'login' %}?next={{ article.get_absolute_url|urlencode }}%23comentarios">{% translate "Entrar" %}</a>
+              <a class="btn btn-secondary btn-small" href="{% url 'signup' %}?next={{ article.get_absolute_url|urlencode }}%23comentarios">{% translate "Crear cuenta" %}</a>
+            </div>
+          {% endif %}
+        {% else %}
+          <p class="muted">{% translate "Los comentarios de esta noticia están cerrados." %}</p>
+        {% endif %}
+
+        {% if comments %}
+          <ul class="comment-list">
+            {% for comment in comments %}
+              {% if comment.is_visible or comment.replies.all %}
+                {% include "news/_comment.html" with is_reply=False %}
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% elif article.allow_comments %}
+          <p class="muted">{% translate "Nadie ha comentado todavía. ¡Rompe el hielo!" %}</p>
+        {% endif %}
+      </section>
+    </article>
+
+    <aside class="stack">
+      {% if article.related_event %}
+        <section class="panel">
+          <h3>📅 {% translate "Evento" %}</h3>
+          <ul class="event-list event-compact">{% include "includes/event_row.html" with event=article.related_event compact=True %}</ul>
+        </section>
+      {% endif %}
+      {% if article.related_championship %}
+        <section class="panel">
+          <h3>🏆 {% translate "Campeonato" %}</h3>
+          <p class="mb-0"><a href="{{ article.related_championship.get_absolute_url }}"><strong>{{ article.related_championship.name }}</strong></a></p>
+          <p class="small muted mb-0">{% translate "Consulta la clasificación y los equipos participantes." %}</p>
+        </section>
+      {% endif %}
+      {% if related_articles %}
+        <section class="panel">
+          <h3>{% translate "Más noticias" %}</h3>
+          <ul class="plain-list">
+            {% for item in related_articles %}
+              <li><a href="{{ item.get_absolute_url }}">{{ item.title }}</a><div class="small muted">{{ item.published_at|date:"j M Y"|lower }}</div></li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

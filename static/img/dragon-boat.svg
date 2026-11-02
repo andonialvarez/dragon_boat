@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 260" role="img" aria-label="Ilustración de un barco dragón con palistas, tamborilero y timonel">
+  <circle cx="300" cy="52" r="44" fill="#e8a33d" opacity=".12"/>
+  <circle cx="300" cy="52" r="26" fill="#e8a33d" opacity=".85"/>
+  <path d="M0 196 Q40 184 80 196 T160 196 T240 196 T320 196 T400 196 T480 196 T560 196 T640 196 T720 196 V260 H0 Z" fill="#138f99" opacity=".35"/>
+  <!-- Timonel (de pie, en la popa) -->
+  <path d="M100 170 L102 120 Q110 110 118 120 L120 170 Z" fill="#f7f1e3"/>
+  <circle cx="110" cy="102" r="9" fill="#f7f1e3"/>
+  <!-- Palistas -->
+    <path d="M136 170 L138 144 Q146 134 154 144 L156 170 Z" fill="#f7f1e3"/>
+    <circle cx="146" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M170 170 L172 144 Q180 134 188 144 L190 170 Z" fill="#f7f1e3"/>
+    <circle cx="180" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M204 170 L206 144 Q214 134 222 144 L224 170 Z" fill="#f7f1e3"/>
+    <circle cx="214" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M238 170 L240 144 Q248 134 256 144 L258 170 Z" fill="#f7f1e3"/>
+    <circle cx="248" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M272 170 L274 144 Q282 134 290 144 L292 170 Z" fill="#f7f1e3"/>
+    <circle cx="282" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M306 170 L308 144 Q316 134 324 144 L326 170 Z" fill="#f7f1e3"/>
+    <circle cx="316" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M340 170 L342 144 Q350 134 358 144 L360 170 Z" fill="#f7f1e3"/>
+    <circle cx="350" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M374 170 L376 144 Q384 134 392 144 L394 170 Z" fill="#f7f1e3"/>
+    <circle cx="384" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M408 170 L410 144 Q418 134 426 144 L428 170 Z" fill="#f7f1e3"/>
+    <circle cx="418" cy="127" r="8.5" fill="#f7f1e3"/>
+    <path d="M442 170 L444 144 Q452 134 460 144 L462 170 Z" fill="#f7f1e3"/>
+    <circle cx="452" cy="127" r="8.5" fill="#f7f1e3"/>
+  <!-- Tamborilero (en la proa, mirando a los palistas) -->
+  <path d="M502 170 L504 146 Q512 136 520 146 L522 170 Z" fill="#f7f1e3"/>
+  <circle cx="512" cy="130" r="8.5" fill="#f7f1e3"/>
+  <line x1="507" y1="146" x2="488" y2="132" stroke="#f7f1e3" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="480" cy="160" rx="13" ry="10" fill="#e8a33d" stroke="#9e0c24" stroke-width="3"/>
+  <!-- Cola -->
+  <path d="M100 172 C80 162 66 140 70 116 C72 104 84 100 90 108 C82 118 84 140 108 164 Z" fill="#c8102e"/>
+  <path d="M70 116 C72 104 84 100 90 108 C84 108 78 110 76 116 Z" fill="#e8a33d"/>
+  <!-- Casco -->
+  <path d="M86 168 L556 168 Q548 198 516 204 L126 204 Q94 198 86 168 Z" fill="#c8102e"/>
+  <rect x="98" y="172" width="452" height="6" rx="3" fill="#e8a33d"/>
+    <circle cx="122" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="138" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="154" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="170" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="186" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="202" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="218" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="234" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="250" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="266" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="282" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="298" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="314" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="330" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="346" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="362" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="378" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="394" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="410" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="426" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="442" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="458" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="474" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="490" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="506" cy="190" r="5" fill="#9e0c24"/>
+    <circle cx="522" cy="190" r="5" fill="#9e0c24"/>
+  <!-- Cabeza de dragón -->
+  <path d="M540 170 C560 160 566 140 572 122 C576 110 586 103 598 105 L626 112 L620 120 L606 121 L622 129 L608 135 L595 131 C590 142 584 160 558 174 Z" fill="#c8102e"/>
+  <path d="M572 122 L556 112 L574 114 L566 98 L582 108 L584 92 L592 106" fill="#e8a33d"/>
+  <line x1="594" y1="106" x2="584" y2="86" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="601" cy="113" r="4.2" fill="#fff"/>
+  <circle cx="602" cy="113" r="2" fill="#0c2035"/>
+  <!-- Remo de gobierno y palas -->
+  <line x1="122" y1="134" x2="40" y2="214" stroke="#e8a33d" stroke-width="5" stroke-linecap="round"/>
+  <line x1="48" y1="202" x2="32" y2="224" stroke="#e8a33d" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="121" cy="136" r="4" fill="#f7f1e3"/>
+    <line x1="150" y1="148" x2="126" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="131" y1="200" x2="123" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="149" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="184" y1="148" x2="160" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="165" y1="200" x2="157" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="183" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="218" y1="148" x2="194" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="199" y1="200" x2="191" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="217" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="252" y1="148" x2="228" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="233" y1="200" x2="225" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="251" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="286" y1="148" x2="262" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="267" y1="200" x2="259" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="285" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="320" y1="148" x2="296" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="301" y1="200" x2="293" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="319" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="354" y1="148" x2="330" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="335" y1="200" x2="327" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="353" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="388" y1="148" x2="364" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="369" y1="200" x2="361" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="387" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="422" y1="148" x2="398" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="403" y1="200" x2="395" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="421" cy="150" r="3.5" fill="#f7f1e3"/>
+    <line x1="456" y1="148" x2="432" y2="212" stroke="#e8a33d" stroke-width="4" stroke-linecap="round"/>
+    <line x1="437" y1="200" x2="429" y2="220" stroke="#e8a33d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="455" cy="150" r="3.5" fill="#f7f1e3"/>
+  <!-- Agua delante -->
+  <path d="M0 212 Q35 200 70 212 T140 212 T210 212 T280 212 T350 212 T420 212 T490 212 T560 212 T630 212 T700 212 V260 H0 Z" fill="#0d6a73"/>
+  <path d="M0 228 Q40 218 80 228 T160 228 T240 228 T320 228 T400 228 T480 228 T560 228 T640 228 T720 228 V260 H0 Z" fill="#0c4f5c"/>
+  <g fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".55">
+    <path d="M120 216 q8 -6 16 0"/><path d="M228 218 q8 -6 16 0"/><path d="M336 216 q8 -6 16 0"/>
+    <path d="M444 218 q8 -6 16 0"/><path d="M560 216 q8 -6 16 0"/>
+  </g>
+</svg>

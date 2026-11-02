@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n site_tags %}
+{% block title %}{% translate "Buscar" %}{% if query %}: {{ query }}{% endif %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="page-head">
+    <h1>{% translate "Buscar" %}</h1>
+    <form method="get" class="search-inline" style="margin:12px 0 0; max-width:560px" role="search">
+      <label class="visually-hidden" for="q">{% translate "Qué buscas" %}</label>
+      <input id="q" type="search" name="q" value="{{ query }}" placeholder="{% translate 'Noticias, eventos, equipos, temas del foro…' %}" >
+      <button class="btn btn-primary" type="submit">{% translate "Buscar" %}</button>
+    </form>
+  </header>
+
+  {% if query %}
+    {% if query|length < 2 %}
+      <p class="muted">{% translate "Escribe al menos dos letras." %}</p>
+    {% elif not total %}
+      {% blocktranslate asvar msg %}No hemos encontrado nada con «{{ query }}».{% endblocktranslate %}
+      {% include "includes/empty.html" with message=msg icon="🔍" %}
+    {% else %}
+      <p class="muted">{% blocktranslate count counter=total %}{{ counter }} resultado{% plural %}{{ counter }} resultados{% endblocktranslate %}</p>
+      {% if results.articles %}
+        <section class="section"><h2>📰 {% translate "Noticias" %}</h2>
+          <div class="grid grid-3">{% for article in results.articles %}{% include "includes/article_card.html" %}{% endfor %}</div>
+        </section>
+      {% endif %}
+      {% if results.events %}
+        <section class="section"><h2>📅 {% translate "Eventos" %}</h2>
+          <ul class="event-list">{% for event in results.events %}{% include "includes/event_row.html" %}{% endfor %}</ul>
+        </section>
+      {% endif %}
+      {% if results.championships %}
+        <section class="section"><h2>🏆 {% translate "Campeonatos" %}</h2>
+          <ul class="plain-list panel">{% for c in results.championships %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a> {% include "includes/sample_badge.html" with obj=c %}<div class="small muted">{{ c.sport.name }} · {{ c.season }}</div></li>{% endfor %}</ul>
+        </section>
+      {% endif %}
+      {% if results.teams %}
+        <section class="section"><h2>🛶 {% translate "Equipos" %}</h2>
+          <div class="grid">{% for team in results.teams %}{% include "includes/team_card.html" %}{% endfor %}</div>
+        </section>
+      {% endif %}
+      {% if results.topics %}
+        <section class="section"><h2>💬 {% translate "Foro" %}</h2>
+          <ul class="plain-list panel">{% for topic in results.topics %}<li><a href="{{ topic.get_absolute_url }}">{{ topic.title }}</a><div class="small muted">{{ topic.category.name }}</div></li>{% endfor %}</ul>
+        </section>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

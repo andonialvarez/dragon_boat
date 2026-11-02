@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Página no encontrada" %}{% endblock %}
+{% block content %}
+<div class="wrap error-page">
+  <div class="code">404</div>
+  <h1>{% translate "Esta página se ha ido a la deriva" %}</h1>
+  <p class="muted">{% translate "Puede que el enlace esté mal o que el contenido se haya borrado." %}</p>
+  <a class="btn btn-primary" href="{% url 'home' %}">{% translate "Volver a la portada" %}</a>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Editar perfil" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card">
+    <h1>{% translate "Editar perfil" %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      {% for field in form %}{% include "includes/field.html" %}{% endfor %}
+      {% include "includes/form_errors.html" with form=email_form %}
+      {% for field in email_form %}{% include "includes/field.html" %}{% endfor %}
+      <p class="small muted">{% translate "Tu email no se muestra en la web." %}</p>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% translate "Guardar" %}</button>
+        <a href="{% url 'profile_detail' user.get_username %}">{% translate "Ver mi perfil" %}</a>
+        <a href="{% url 'password_change' %}">{% translate "Cambiar contraseña" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

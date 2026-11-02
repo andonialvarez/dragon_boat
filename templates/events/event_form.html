@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if is_new %}{% translate "Publicar un evento" %}{% else %}{% translate "Editar evento" %}{% endif %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card wide">
+    <nav class="breadcrumbs"><a href="{% if event %}{{ event.get_absolute_url }}{% else %}{% url 'event_list' %}{% endif %}">← {% if event %}{{ event.title }}{% else %}{% translate "Eventos" %}{% endif %}</a></nav>
+    <h1>{% if is_new %}📅 {% translate "Publicar un evento" %}{% else %}{% translate "Editar evento" %}{% endif %}</h1>
+    {% if is_new %}<p class="muted">{% translate "Regatas, jornadas de liga, entrenamientos abiertos, cursos, festivales... Si es de remo o pala, tiene sitio aquí." %}</p>{% endif %}
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      <div class="form-grid">
+        {% include "includes/field.html" with field=form.sport %}
+        {% include "includes/field.html" with field=form.kind %}
+      </div>
+      {% include "includes/field.html" with field=form.title %}
+      {% include "includes/field.html" with field=form.summary %}
+      <fieldset>
+        <legend>{% translate "Fecha y lugar" %}</legend>
+        <div class="form-grid">
+          {% include "includes/field.html" with field=form.start_date %}
+          {% include "includes/field.html" with field=form.end_date %}
+          {% include "includes/field.html" with field=form.start_time %}
+        </div>
+        {% include "includes/field.html" with field=form.venue %}
+        <div class="form-grid">
+          {% include "includes/field.html" with field=form.city %}
+          {% include "includes/field.html" with field=form.region %}
+          {% include "includes/field.html" with field=form.country %}
+        </div>
+      </fieldset>
+      {% include "includes/field.html" with field=form.description %}
+      <fieldset>
+        <legend>{% translate "Competición e inscripción" %}</legend>
+        <div class="form-grid">
+          {% include "includes/field.html" with field=form.distances %}
+          {% include "includes/field.html" with field=form.organizer %}
+        </div>
+        <div class="form-grid">
+          {% include "includes/field.html" with field=form.website %}
+          {% include "includes/field.html" with field=form.registration_url %}
+          {% include "includes/field.html" with field=form.registration_deadline %}
+        </div>
+      </fieldset>
+      {% include "includes/field.html" with field=form.cover_image %}
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% if is_new %}{% translate "Publicar" %}{% else %}{% translate "Guardar cambios" %}{% endif %}</button>
+        <a href="{% if event %}{{ event.get_absolute_url }}{% else %}{% url 'event_list' %}{% endif %}">{% translate "Cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

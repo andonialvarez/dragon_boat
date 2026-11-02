@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Editar comentario" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card wide">
+    <nav class="breadcrumbs"><a href="{{ comment.get_absolute_url }}">← {{ comment.article.title }}</a></nav>
+    <h1>{% translate "Editar comentario" %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      {% include "includes/field.html" with field=form.body %}
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% translate "Guardar cambios" %}</button>
+        <a href="{{ comment.get_absolute_url }}">{% translate "Cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

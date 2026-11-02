@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+{% block title %}{% translate "Foro" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="page-head">
+    <h1>💬 {% translate "Foro" %}</h1>
+    <p>{% translate "Pregunta, comparte y conoce a otros palistas y remeros. Leer es libre; para escribir necesitas una cuenta." %}</p>
+  </header>
+
+  {% if not user.is_authenticated %}
+    <div class="login-cta" style="margin-bottom:22px">
+      <p>{% translate "¿Quieres participar? Crea una cuenta gratis o entra con la tuya." %}</p>
+      <a class="btn btn-primary btn-small" href="{% url 'signup' %}?next={% url 'forum:index' %}">{% translate "Crear cuenta" %}</a>
+      <a class="btn btn-secondary btn-small" href="{% url 'login' %}?next={% url 'forum:index' %}">{% translate "Entrar" %}</a>
+    </div>
+  {% endif %}
+
+  <div class="forum-table" role="table" aria-label="{% translate 'Categorías del foro' %}">
+    <div class="forum-row head" role="row">
+      <span></span><span>{% translate "Categoría" %}</span><span class="text-center">{% translate "Temas" %}</span><span>{% translate "Última actividad" %}</span>
+    </div>
+    {% for category in categories %}
+      <div class="forum-row" role="row">
+        <div class="icon" aria-hidden="true">{{ category.icon|default:"💬" }}</div>
+        <div>
+          <h3><a class="card-link" href="{{ category.get_absolute_url }}">{{ category.name }}</a></h3>
+          <p>{{ category.description }}</p>
+          <span class="mobile-meta">{{ category.topic_count }} {% translate "temas" %}{% if category.last_activity %} · {{ category.last_activity|naturaltime }}{% endif %}</span>
+        </div>
+        <div class="count">{{ category.topic_count }}<small>{% blocktranslate count counter=category.post_count %}{{ counter }} mensaje{% plural %}{{ counter }} mensajes{% endblocktranslate %}</small></div>
+        <div class="last">
+          {% if category.last_topic_id %}
+            <a href="{% url 'forum:topic' category.last_topic_id category.last_topic_slug %}">{{ category.last_topic_title|truncatechars:40 }}</a><br>{{ category.last_activity|naturaltime }}
+          {% else %}—{% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if recent_topics %}
+    <section class="section" aria-labelledby="t-recientes">
+      <div class="section-head"><h2 id="t-recientes">{% translate "Temas con actividad reciente" %}</h2></div>
+      <div class="forum-table">
+        {% for topic in recent_topics %}{% include "includes/topic_row.html" with show_category=True %}{% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

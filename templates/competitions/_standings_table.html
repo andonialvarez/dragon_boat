@@ -1,0 +1,30 @@
+{% load i18n %}
+{% with rows=division.standings.all %}
+<div class="table-wrap">
+  <table class="standings">
+    <caption>{{ division.name }}{% if division.notes %}<small>{{ division.notes }}</small>{% endif %}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{% translate "Puesto" %}</th>
+        <th scope="col">{% translate "Equipo" %}</th>
+        {% if division.has_points %}<th scope="col" class="num">{% translate "Puntos" %}</th>{% endif %}
+        {% if division.has_times %}<th scope="col" class="num">{% translate "Tiempo" %}</th>{% endif %}
+        {% if division.has_notes %}<th scope="col">{% translate "Observaciones" %}</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td><span class="pos pos-{{ row.position }}">{{ row.position }}</span></td>
+          <td class="team-name"><a href="{{ row.team.get_absolute_url }}">{{ row.team.name }}</a><span class="origin">📍 {{ row.team.origin }}</span></td>
+          {% if division.has_points %}<td class="num">{% if row.points is not None %}{{ row.points|floatformat:"-2" }}{% else %}—{% endif %}</td>{% endif %}
+          {% if division.has_times %}<td class="num">{{ row.result_time|default:"—" }}</td>{% endif %}
+          {% if division.has_notes %}<td class="small muted">{{ row.notes }}</td>{% endif %}
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="muted">{% translate "Clasificación pendiente." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endwith %}

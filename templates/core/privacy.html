@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Privacidad" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <article class="form-card wide" style="max-width:780px">
+    <h1>{% translate "Política de privacidad" %}</h1>
+    <p class="notice warn">{% translate "Texto provisional: el responsable de la web debe completarlo con sus datos (nombre o asociación, contacto) antes de abrirla al público." %}</p>
+    <div class="prose">
+      <h2>{% translate "Qué datos guardamos" %}</h2>
+      <p>{% translate "Si creas una cuenta: tu nombre de usuario, tu email y una versión cifrada de tu contraseña. Si rellenas tu perfil, también tu club, localidad, deporte favorito y descripción. Además, lo que publiques (noticias, eventos, comentarios, mensajes y reacciones)." %}</p>
+      <h2>{% translate "Para qué los usamos" %}</h2>
+      <p>{% translate "Solo para que puedas usar la web: identificarte, mostrar tu nombre junto a lo que publicas y enviarte el enlace para recuperar la contraseña si lo pides. No vendemos ni cedemos tus datos." %}</p>
+      <h2>{% translate "Cookies" %}</h2>
+      <p>{% translate "Usamos solo cookies técnicas imprescindibles: la de sesión (para saber que has iniciado sesión) y la de seguridad de los formularios. No usamos cookies de publicidad ni de seguimiento." %}</p>
+      <h2>{% translate "Tus derechos" %}</h2>
+      <p>{% translate "Puedes pedir en cualquier momento ver, corregir o borrar tus datos y tu cuenta escribiendo al responsable de la web." %}</p>
+    </div>
+  </article>
+</div>
+{% endblock %}

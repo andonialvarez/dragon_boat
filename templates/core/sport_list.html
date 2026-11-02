@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Deportes" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="page-head">
+    <h1>{% translate "Deportes de remo y pala" %}</h1>
+    <p>{% translate "El dragon boat es el protagonista de esta web, pero comparte agua con otros deportes. Un truco para distinguirlos: en los deportes de pala se mira hacia delante; en los de remo, de espaldas." %}</p>
+  </header>
+  <div class="grid grid-3">
+    {% for sport in sports %}
+      <article class="card sport-card" style="--sport: {{ sport.color }}">
+        <div class="card-body">
+          <span class="icon" aria-hidden="true">{{ sport.icon }}</span>
+          <h2 class="card-title"><a class="card-link" href="{{ sport.get_absolute_url }}">{{ sport.name }}</a></h2>
+          <div class="badges">
+            {% if sport.is_primary %}<span class="badge badge-red">{% translate "Principal" %}</span>{% endif %}
+            <span class="badge">{{ sport.get_propulsion_display }}</span>
+          </div>
+          <p>{{ sport.tagline }}</p>
+          <div class="meta">
+            <span>{% blocktranslate count counter=sport.team_count %}{{ counter }} equipo{% plural %}{{ counter }} equipos{% endblocktranslate %}</span>
+            <span>{% blocktranslate count counter=sport.championship_count %}{{ counter }} campeonato{% plural %}{{ counter }} campeonatos{% endblocktranslate %}</span>
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
