@@ -1,6 +1,8 @@
 name: Importar noticias
 
-# Pide a la web que importe titulares de sus fuentes RSS cada 6 horas.
+# Pide a la web que importe titulares de sus fuentes RSS una vez a la semana:
+# los lunes a las 7:00 UTC (8:00 en invierno y 9:00 en verano, hora peninsular).
+# Para cambiar el día u hora, edita la línea `cron` (minuto hora * * día; 1 = lunes, 2 = martes).
 # Para activarlo, añade en GitHub (Settings > Secrets and variables > Actions):
 #   SITE_URL        -> la dirección de la web, por ejemplo https://dragonboat.onrender.com
 #   NEWS_API_TOKEN  -> el mismo valor que la variable NEWS_API_TOKEN del servidor
@@ -8,7 +10,7 @@ name: Importar noticias
 
 on:
   schedule:
-    - cron: "15 */6 * * *"
+    - cron: "0 7 * * 1"
   workflow_dispatch:
 
 jobs:

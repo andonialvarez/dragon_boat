@@ -167,7 +167,7 @@ python manage.py importar_noticias
 
 Descarta titulares que no contengan las palabras clave de la fuente, los de más de 30 días y los repetidos.
 
-**Para que se ejecute solo** hay un flujo de GitHub Actions (`.github/workflows/importar-noticias.yml`) que cada 6 horas pide a la web que importe. Se activa añadiendo dos secretos en GitHub (*Settings › Secrets and variables › Actions*): `SITE_URL` (la dirección de la web) y `NEWS_API_TOKEN` (el mismo valor que en el servidor). La frecuencia se cambia en la línea `cron` del fichero.
+**Para que se ejecute solo** hay un flujo de GitHub Actions (`.github/workflows/importar-noticias.yml`) que **cada lunes por la mañana** pide a la web que importe. Se activa añadiendo dos secretos en GitHub (*Settings › Secrets and variables › Actions*): `SITE_URL` (la dirección de la web) y `NEWS_API_TOKEN` (el mismo valor que en el servidor). La frecuencia se cambia en la línea `cron` del fichero.
 
 ### 2. API para publicar resúmenes
 
