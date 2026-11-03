@@ -9,7 +9,7 @@
       <h1>{{ category.icon }} {{ category.name }}</h1>
       <p>{{ category.description }}</p>
     </div>
-    <a class="btn btn-primary" href="{% url 'forum:new_topic' category.slug %}">＋ {% translate "Nuevo tema" %}</a>
+    <a class="btn btn-primary" href="{% url 'forum:new_topic' category.slug %}"{% if not user.is_authenticated %} data-login="nuevo-tema"{% endif %}>＋ {% translate "Nuevo tema" %}</a>
   </header>
 
   {% if topics %}

@@ -8,7 +8,7 @@
       <h1>{% if show_past %}{% translate "Eventos pasados" %}{% else %}{% translate "Próximos eventos y regatas" %}{% endif %}</h1>
       <p>{% translate "Regatas, jornadas de liga, campeonatos, festivales y cursos. Puedes descargar cada evento para tu calendario." %}</p>
     </div>
-    <a class="btn btn-primary" href="{% url 'event_create' %}">＋ {% translate "Publicar evento" %}</a>
+    <a class="btn btn-primary" href="{% url 'event_create' %}"{% if not user.is_authenticated %} data-login="publicar-evento"{% endif %}>＋ {% translate "Publicar evento" %}</a>
   </header>
 
   <nav class="filters" aria-label="{% translate 'Cuándo' %}">

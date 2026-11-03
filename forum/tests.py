@@ -49,6 +49,16 @@ class ForumTests(TestCase):
         self.assertEqual(self.client.get(reverse("forum:index")).status_code, 200)
         self.assertContains(self.client.get(topic.get_absolute_url()), "Primer mensaje del tema.")
 
+    def test_no_sign_up_notice_until_you_try_to_write(self):
+        topic = self.make_topic()
+        index = self.client.get(reverse("forum:index"))
+        self.assertNotContains(index, "login-cta")
+        self.assertNotContains(index, "necesitas una cuenta</p>")
+        page = self.client.get(topic.get_absolute_url())
+        self.assertContains(page, 'data-login="responder"')
+        category = self.client.get(topic.category.get_absolute_url())
+        self.assertContains(category, 'data-login="nuevo-tema"')
+
     def test_writing_requires_login(self):
         topic = self.make_topic()
         response = self.client.get(self.new_topic_url())

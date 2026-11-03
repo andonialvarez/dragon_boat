@@ -5,7 +5,7 @@ tarea semanal sube `noticias/semana.json` a la rama `noticias-semanales`.
 
 Formato del fichero: una lista de noticias, cada una con
     title, summary, body, sport, category, source_name, source_url
-(ver noticias/README.md). Solo usa la biblioteca estándar de Python.
+y, si se quiere, image_url (ver noticias/README.md). Solo usa la biblioteca estándar de Python.
 
 Uso: SITE_URL=... NEWS_API_TOKEN=... python scripts/publicar_noticias.py noticias/semana.json
 """
@@ -43,6 +43,9 @@ def validate(items):
         url = str(item.get("source_url") or "")
         if url and not url.startswith(("http://", "https://")):
             errors.append(f"noticia {number}: «source_url» debe empezar por http:// o https://")
+        image = str(item.get("image_url") or "")
+        if image and not image.startswith(("http://", "https://")):
+            errors.append(f"noticia {number}: «image_url» debe empezar por http:// o https://")
         if url in seen:
             errors.append(f"noticia {number}: «source_url» repetido en el fichero")
         seen.add(url)
@@ -107,7 +110,7 @@ def main(path):
 
     created = duplicated = failed = 0
     for item in items:
-        payload = {key: item[key] for key in (*REQUIRED, "sport", "category") if item.get(key)}
+        payload = {key: item[key] for key in (*REQUIRED, "sport", "category", "image_url") if item.get(key)}
         payload["origin"] = "ia"  # Se muestra como «Resumen con IA».
         status, body = request(f"{site}/api/noticias/", payload, token)
         if status == 201:

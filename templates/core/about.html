@@ -17,8 +17,8 @@
       <section class="panel">
         <h3>{% translate "Participa" %}</h3>
         <ul class="plain-list">
-          <li><a href="{% url 'article_create' %}">📰 {% translate "Publicar noticia" %}</a></li>
-          <li><a href="{% url 'event_create' %}">📅 {% translate "Publicar evento" %}</a></li>
+          <li><a href="{% url 'article_create' %}"{% if not user.is_authenticated %} data-login="publicar-noticia"{% endif %}>📰 {% translate "Publicar noticia" %}</a></li>
+          <li><a href="{% url 'event_create' %}"{% if not user.is_authenticated %} data-login="publicar-evento"{% endif %}>📅 {% translate "Publicar evento" %}</a></li>
           <li><a href="{% url 'forum:index' %}">💬 {% translate "Ir al foro" %}</a></li>
           <li><a href="{% url 'rules' %}">📜 {% translate "Normas de la comunidad" %}</a></li>
         </ul>

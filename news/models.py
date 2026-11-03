@@ -59,6 +59,15 @@ class Article(SampleFlagMixin, TimeStampedMixin):
         validators=[validate_image_extension, validate_image_size],
     )
     image_caption = models.CharField(_("pie de foto"), max_length=200, blank=True)
+    image_url = models.URLField(
+        _("imagen de la fuente"),
+        max_length=600,
+        blank=True,
+        help_text=_(
+            "Imagen que el medio original usa para compartir la noticia. Se busca sola en las noticias "
+            "importadas y en los resúmenes; se muestra enlazada y con el nombre del medio."
+        ),
+    )
     source_name = models.CharField(_("fuente"), max_length=120, blank=True)
     source_url = models.URLField(_("enlace a la fuente"), max_length=600, blank=True, db_index=True)
     author = models.ForeignKey(
@@ -119,6 +128,15 @@ class Article(SampleFlagMixin, TimeStampedMixin):
     @property
     def is_published(self):
         return self.status == self.Status.PUBLISHED and self.published_at <= timezone.now()
+
+    @property
+    def picture_url(self):
+        """La imagen subida o, si no hay, la del medio original."""
+        return self.cover_image.url if self.cover_image else self.image_url
+
+    @property
+    def picture_is_external(self):
+        return not self.cover_image and bool(self.image_url)
 
     @property
     def is_external(self):

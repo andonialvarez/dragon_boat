@@ -1,0 +1,7 @@
+{% load i18n %}
+{# Para quien no ha entrado: parece la caja de escribir, pero abre la ventana para entrar o registrarse. #}
+<a class="write-teaser" href="{% url 'login' %}?next={{ next|urlencode }}{{ anchor|urlencode }}" data-login="{{ action }}" data-next="{{ next }}{{ anchor }}">
+  <span class="write-teaser-icon" aria-hidden="true">✍️</span>
+  <span class="write-teaser-text">{{ text }}</span>
+  <span class="btn btn-primary btn-small">{{ button }}</span>
+</a>

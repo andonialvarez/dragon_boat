@@ -24,6 +24,8 @@ Formato de `semana.json`, una lista de noticias:
 
 - `sport`: `dragon-boat`, `traineras`, `piraguismo`, `remo-olimpico` o `vaa`.
 - `category`: `competicion`, `clubes`, `internacional`, `tecnica`, `entrevista`, `comunidad` u `otros`.
+- `image_url` (opcional): imagen del medio original. Si no se pone, la web busca sola la que el
+  medio usa para compartir la noticia y, si no hay, muestra una ilustración del deporte.
 - Límites: `title` 200 caracteres, `summary` 320 y `source_name` 120.
 - Si una noticia ya estaba publicada (mismo `source_url`), la web no la duplica.
 

@@ -6,7 +6,7 @@
       <input type="hidden" name="next" value="{{ next_url }}">
       <button class="reaction-btn" type="submit" data-kind="{{ r.kind }}" data-count="{{ r.count }}"
               aria-pressed="{% if r.mine %}true{% else %}false{% endif %}"
-              title="{{ r.label }}{% if not user.is_authenticated %} · {% translate 'Inicia sesión para reaccionar' %}{% endif %}">
+              title="{{ r.label }}"{% if not user.is_authenticated %} data-login="reaccionar"{% endif %}>
         <span class="emoji" aria-hidden="true">{{ r.emoji }}</span>
         <span class="visually-hidden">{{ r.label }}</span>
         <span class="count">{% if r.count %}{{ r.count }}{% endif %}</span>

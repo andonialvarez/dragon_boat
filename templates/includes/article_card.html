@@ -1,7 +1,7 @@
 {% load i18n %}
 <article class="card">
   {% include "includes/sample_badge.html" with obj=article corner=True %}
-  {% include "includes/media.html" with image=article.cover_image sport=article.sport alt=article.title %}
+  {% include "includes/media.html" with image=article.cover_image image_url=article.image_url credit=article.source_name sport=article.sport alt=article.title seed=article.pk %}
   <div class="card-body">
     <div class="badges">
       {% if article.sport %}<span class="chip" style="--sport: {{ article.sport.color }}">{{ article.sport.icon }} {{ article.sport.name }}</span>{% endif %}

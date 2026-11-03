@@ -240,6 +240,9 @@ COMMUNITY_DAILY_LIMIT = int(os.environ.get("COMMUNITY_DAILY_LIMIT", "10"))
 # Clave para la API de publicación automática (importador y resúmenes de Claude).
 # Si está vacía, la API queda desactivada.
 NEWS_API_TOKEN = os.environ.get("NEWS_API_TOKEN", "")
+# Buscar la imagen que cada medio usa para compartir sus noticias (og:image).
+# En las pruebas está apagado para no salir a internet.
+NEWS_FETCH_IMAGES = env_bool("NEWS_FETCH_IMAGES", default=True) and not TESTING
 
 
 # --- Datos de la web --------------------------------------------------------

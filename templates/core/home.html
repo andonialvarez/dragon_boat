@@ -23,9 +23,13 @@
       <img src="{% static 'img/dragon-boat.svg' %}" alt="{% translate 'Ilustración de un barco dragón con palistas, tamborilero y timonel' %}" width="660" height="260">
     </div>
   </div>
-  <svg class="hero-waves" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 46 V24 Q75 4 150 24 T300 24 T450 24 T600 24 T750 24 T900 24 T1050 24 T1200 24 V46 Z" style="fill: var(--bg)"/>
-  </svg>
+  <div class="hero-sea" aria-hidden="true">
+    <span class="sea-layer sea-back"></span>
+    <span class="sea-layer sea-mid"></span>
+    <svg class="hero-waves" viewBox="0 0 1200 46" preserveAspectRatio="none">
+      <path d="M0 46 V24 Q75 4 150 24 T300 24 T450 24 T600 24 T750 24 T900 24 T1050 24 T1200 24 V46 Z" style="fill: var(--bg)"/>
+    </svg>
+  </div>
 </section>
 
 <div class="wrap">
@@ -37,7 +41,7 @@
     {% if lead %}
       <article class="card lead-story">
         {% include "includes/sample_badge.html" with obj=lead corner=True %}
-        {% include "includes/media.html" with image=lead.cover_image sport=lead.sport alt=lead.title %}
+        {% include "includes/media.html" with image=lead.cover_image image_url=lead.image_url credit=lead.source_name sport=lead.sport alt=lead.title seed=lead.pk %}
         <div class="card-body">
           <div class="badges">
             {% if lead.sport %}<span class="chip" style="--sport: {{ lead.sport.color }}">{{ lead.sport.icon }} {{ lead.sport.name }}</span>{% endif %}
@@ -62,6 +66,10 @@
     {% endif %}
   </section>
 
+</div>
+
+<div class="band band-sea">
+  <div class="wrap">
   <div class="layout-2 section">
     <section aria-labelledby="titulo-eventos">
       <div class="section-head">
@@ -125,6 +133,10 @@
     </aside>
   </div>
 
+  </div>
+</div>
+
+<div class="wrap">
   <section class="section" aria-labelledby="titulo-deportes">
     <div class="section-head">
       <h2 id="titulo-deportes">{% translate "Deportes de remo y pala" %}</h2>
@@ -140,14 +152,5 @@
     </div>
   </section>
 
-  {% if not user.is_authenticated %}
-    <section class="section">
-      <div class="login-cta">
-        <p><strong>{% translate "¿Remas, palas o animas desde el muelle?" %}</strong> {% translate "Crea una cuenta gratis para comentar noticias, reaccionar y participar en el foro." %}</p>
-        <a class="btn btn-primary" href="{% url 'signup' %}">{% translate "Crear cuenta" %}</a>
-        <a class="btn btn-secondary" href="{% url 'login' %}">{% translate "Ya tengo cuenta" %}</a>
-      </div>
-    </section>
-  {% endif %}
 </div>
 {% endblock %}

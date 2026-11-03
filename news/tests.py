@@ -15,7 +15,8 @@ from core.models import Sport
 from events.models import Event
 from scripts import publicar_noticias
 
-from .importer import import_source
+from .images import extract_image, fill_missing_images, find_image
+from .importer import entry_image, import_source
 from .models import Article, Comment, NewsSource
 
 User = get_user_model()
@@ -66,7 +67,18 @@ class CommentTests(TestCase):
 
     def test_anonymous_sees_invitation_to_sign_up(self):
         response = self.client.get(self.article.get_absolute_url())
+        # Sin avisos: la caja de comentar y las reacciones abren la ventana para entrar o registrarse.
+        self.assertContains(response, 'id="unete"')
         self.assertContains(response, reverse("signup"))
+        self.assertContains(response, 'data-login="comentar"')
+        self.assertContains(response, 'data-login="reaccionar"')
+        self.assertNotContains(response, "Inicia sesión para reaccionar")
+
+    def test_logged_in_user_gets_no_sign_up_window(self):
+        self.client.force_login(self.ane)
+        response = self.client.get(self.article.get_absolute_url())
+        self.assertNotContains(response, 'id="unete"')
+        self.assertNotContains(response, "data-login=")
 
     def test_comment_and_replies(self):
         self.client.force_login(self.ane)
@@ -206,7 +218,7 @@ RSS = """<?xml version="1.0" encoding="UTF-8"?>
   <title>Gran regata de dragon boat en Sevilla - Diario de Prueba</title>
   <link>https://example.com/noticia-1</link>
   <source url="https://example.com">Diario de Prueba</source>
-  <description>&lt;p&gt;Veinte tripulaciones de dragon boat compiten en el Guadalquivir.&lt;/p&gt;</description>
+  <description>&lt;p&gt;Veinte tripulaciones de dragon boat compiten en el Guadalquivir.&lt;/p&gt;&lt;img src="/fotos/regata.jpg"&gt;</description>
   <pubDate>{recent}</pubDate>
 </item>
 <item>
@@ -244,6 +256,8 @@ class ImporterTests(TestCase):
         self.assertEqual(article.origin, Article.Origin.IMPORTED)
         self.assertNotIn("<p>", article.summary)
         self.assertTrue(article.is_published)
+        # La imagen que trae el feed se guarda como enlace absoluto.
+        self.assertEqual(article.image_url, "https://example.com/fotos/regata.jpg")
 
     def test_does_not_import_twice(self):
         import_source(self.source, content=self.xml)
@@ -411,3 +425,142 @@ class WeeklyPublishingTests(LiveServerTestCase):
         self.assertEqual(code, 1)
         self.assertIn("falta «title»", output)
         self.assertFalse(Article.objects.filter(source_url__startswith="https://medio.example.com/").exists())
+
+
+class SourceImageTests(TestCase):
+    def test_extract_image_prefers_open_graph(self):
+        html = (
+            '<html><head><meta name="twitter:image" content="https://cdn.example.com/tw.jpg">'
+            '<meta property="og:image" content="/img/portada.jpg"></head><body>'
+            '<meta property="og:image" content="https://no-cuenta.example.com/x.jpg"></body></html>'
+        )
+        self.assertEqual(
+            extract_image(html, "https://medio.example.com/noticia"), "https://medio.example.com/img/portada.jpg"
+        )
+
+    def test_extract_image_fallbacks_and_rejections(self):
+        self.assertEqual(
+            extract_image('<meta name="twitter:image" content="//cdn.example.com/a.png">', "https://m.example.com/"),
+            "https://cdn.example.com/a.png",
+        )
+        self.assertEqual(
+            extract_image('<link rel="image_src" href="b.jpg">', "https://m.example.com/n/"),
+            "https://m.example.com/n/b.jpg",
+        )
+        self.assertEqual(
+            extract_image('<meta property="og:image" content="javascript:alert(1)">', "https://m.example.com/"), ""
+        )
+        self.assertEqual(extract_image("<p>sin imagen</p>", "https://m.example.com/"), "")
+
+    def test_find_image_skips_google_news_and_private_hosts(self):
+        with mock.patch("news.images.urllib.request.urlopen") as urlopen:
+            self.assertEqual(find_image("https://news.google.com/rss/articles/abc"), "")
+            self.assertEqual(find_image("http://127.0.0.1:8000/admin/"), "")
+            self.assertEqual(find_image("ftp://example.com/a"), "")
+            urlopen.assert_not_called()
+
+    def test_entry_image_from_media_content(self):
+        entry = {
+            "link": "https://m.example.com/n",
+            "media_content": [{"url": "https://m.example.com/foto.jpg", "medium": "image"}],
+        }
+        self.assertEqual(entry_image(entry), "https://m.example.com/foto.jpg")
+        self.assertEqual(entry_image({"link": "https://m.example.com/n"}), "")
+
+    @override_settings(NEWS_FETCH_IMAGES=True)
+    def test_fill_missing_images_only_for_news_from_other_sites(self):
+        imported = Article.objects.create(
+            title="Importada",
+            summary="Resumen.",
+            origin=Article.Origin.IMPORTED,
+            status=Article.Status.PUBLISHED,
+            source_url="https://medio.example.com/1",
+        )
+        google = Article.objects.create(
+            title="De Google",
+            summary="Resumen.",
+            origin=Article.Origin.IMPORTED,
+            status=Article.Status.PUBLISHED,
+            source_url="https://news.google.com/rss/articles/x",
+        )
+        community = Article.objects.create(
+            title="De la comunidad",
+            summary="Resumen.",
+            origin=Article.Origin.COMMUNITY,
+            status=Article.Status.PUBLISHED,
+            source_url="https://medio.example.com/2",
+        )
+        with mock.patch("news.images.find_image", return_value="https://medio.example.com/foto.jpg") as finder:
+            result = fill_missing_images()
+        finder.assert_called_once_with("https://medio.example.com/1")
+        self.assertEqual(result, {"checked": 1, "updated": 1})
+        imported.refresh_from_db()
+        google.refresh_from_db()
+        community.refresh_from_db()
+        self.assertEqual(imported.image_url, "https://medio.example.com/foto.jpg")
+        self.assertEqual((google.image_url, community.image_url), ("", ""))
+
+
+@override_settings(NEWS_API_TOKEN="token-de-prueba")
+class ApiImageTests(TestCase):
+    def post(self, **extra):
+        payload = {
+            "title": "Resumen con imagen",
+            "summary": "Resumen propio.",
+            "body": "Texto.",
+            "source_name": "Medio",
+            "source_url": "https://medio.example.com/noticia",
+        }
+        payload.update(extra)
+        return self.client.post(
+            "/api/noticias/",
+            json.dumps(payload),
+            content_type="application/json",
+            HTTP_AUTHORIZATION="Bearer token-de-prueba",
+        )
+
+    def test_accepts_image_url(self):
+        response = self.post(image_url="https://medio.example.com/foto.jpg")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Article.objects.get().image_url, "https://medio.example.com/foto.jpg")
+        self.assertEqual(self.post(source_url="https://medio.example.com/otra", image_url="data:x").status_code, 400)
+
+    @override_settings(NEWS_FETCH_IMAGES=True)
+    def test_looks_up_image_of_the_source(self):
+        with mock.patch("news.api.find_image", return_value="https://medio.example.com/og.jpg") as finder:
+            self.assertEqual(self.post().status_code, 201)
+        finder.assert_called_once_with("https://medio.example.com/noticia")
+        article = Article.objects.get()
+        self.assertEqual(article.image_url, "https://medio.example.com/og.jpg")
+
+        page = self.client.get(article.get_absolute_url())
+        self.assertContains(page, 'src="https://medio.example.com/og.jpg"')
+        self.assertContains(page, 'referrerpolicy="no-referrer"')
+        self.assertContains(page, "Imagen: Medio")
+        self.assertContains(page, 'target="_blank">Medio</a>')  # La fuente se cita con su nombre.
+        self.assertContains(page, '<meta property="og:image" content="https://medio.example.com/og.jpg">')
+
+    def test_fill_images_endpoint_requires_token(self):
+        self.assertEqual(self.client.post("/api/noticias/imagenes/").status_code, 401)
+        response = self.client.post("/api/noticias/imagenes/", HTTP_AUTHORIZATION="Bearer token-de-prueba")
+        self.assertEqual(response.json(), {"checked": 0, "updated": 0})
+
+
+class CoverArtTests(TestCase):
+    def test_every_article_has_a_picture(self):
+        sport = Sport.objects.get(slug="traineras")
+        article = Article.objects.create(
+            title="Sin foto", summary="Resumen.", sport=sport, status=Article.Status.PUBLISHED
+        )
+        list_page = self.client.get(reverse("article_list"))
+        self.assertContains(list_page, "img/portadas/traineras-")
+        self.assertContains(self.client.get(article.get_absolute_url()), "img/portadas/traineras-")
+
+    def test_cover_art_files_exist(self):
+        from django.contrib.staticfiles import finders
+
+        from core.templatetags.site_tags import COVER_MOMENTS, COVER_SPORTS
+
+        for sport in COVER_SPORTS:
+            for moment in COVER_MOMENTS:
+                self.assertTrue(finders.find(f"img/portadas/{sport}-{moment}.svg"), f"{sport}-{moment}")

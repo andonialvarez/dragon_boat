@@ -24,6 +24,7 @@ from django.views.decorators.http import require_POST
 
 from core.models import Sport
 
+from .images import clean_image_url, fill_missing_images, find_image
 from .importer import import_from_sources
 from .models import Article, NewsSource
 
@@ -70,7 +71,11 @@ def create_article(request):
             existing = Article.objects.filter(source_url=source_url).first()
             if existing:
                 return JsonResponse(
-                    {"duplicate": True, "id": existing.pk, "url": request.build_absolute_uri(existing.get_absolute_url())}
+                    {
+                        "duplicate": True,
+                        "id": existing.pk,
+                        "url": request.build_absolute_uri(existing.get_absolute_url()),
+                    }
                 )
 
         sport = None
@@ -85,6 +90,14 @@ def create_article(request):
         origin = payload.get("origin") or Article.Origin.AI
         if origin not in Article.Origin.values:
             raise ValidationError(f"origen desconocido: {origin}")
+
+        image_url = ""
+        if payload.get("image_url"):
+            image_url = clean_image_url(str(payload["image_url"]))
+            if not image_url:
+                raise ValidationError("«image_url» debe ser un enlace http:// o https://")
+        elif source_url and settings.NEWS_FETCH_IMAGES:
+            image_url = find_image(source_url)
 
         published_at = timezone.now()
         if payload.get("published_at"):
@@ -105,6 +118,7 @@ def create_article(request):
             published_at=published_at,
             source_name=(payload.get("source_name") or "")[:120],
             source_url=source_url,
+            image_url=image_url,
         )
         article.full_clean(exclude=["slug"])
         article.save()
@@ -113,7 +127,11 @@ def create_article(request):
         return JsonResponse({"error": message}, status=400)
 
     return JsonResponse(
-        {"id": article.pk, "url": request.build_absolute_uri(article.get_absolute_url())},
+        {
+            "id": article.pk,
+            "url": request.build_absolute_uri(article.get_absolute_url()),
+            "image_url": article.image_url,
+        },
         status=201,
     )
 
@@ -127,3 +145,11 @@ def run_import(request):
         {"created": report.created, "skipped": report.skipped, "errors": report.errors},
         status=200 if not report.errors else 207,
     )
+
+
+@csrf_exempt
+@require_POST
+@token_required
+def fill_images(request):
+    """Busca la imagen de las noticias recientes que aún no tienen (con límite de tiempo)."""
+    return JsonResponse(fill_missing_images(limit=25, seconds=18))

@@ -85,6 +85,7 @@
   </main>
 
   <footer class="site-footer">
+    <img class="footer-boat" src="{% static 'img/dragon-boat.svg' %}" alt="" aria-hidden="true" width="330" height="130" loading="lazy">
     <svg class="waves" viewBox="0 0 1200 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 34 V18 Q75 0 150 18 T300 18 T450 18 T600 18 T750 18 T900 18 T1050 18 T1200 18 V34 Z" fill="#0c2035"/></svg>
     <div class="wrap">
       <div class="about">
@@ -123,6 +124,31 @@
       </div>
     </div>
   </footer>
+
+  {% if not user.is_authenticated %}
+    {# Ventana que aparece al intentar participar sin haber entrado. Sin JavaScript, los enlaces llevan a la página de entrar. #}
+    <dialog class="join-dialog" id="unete" aria-labelledby="unete-titulo">
+      <form method="dialog"><button class="join-close" type="submit" aria-label="{% translate 'Cerrar' %}">×</button></form>
+      <div class="join-art" aria-hidden="true">
+        <img src="{% static 'img/portadas/dragon-boat-atardecer.svg' %}" alt="" width="640" height="360">
+      </div>
+      <div class="join-body">
+        <h2 id="unete-titulo">{% translate "¡Súbete al barco!" %}</h2>
+        <p class="join-reason"
+           data-comentar="{% translate 'Para comentar necesitas una cuenta.' %}"
+           data-responder="{% translate 'Para responder necesitas una cuenta.' %}"
+           data-reaccionar="{% translate 'Para reaccionar necesitas una cuenta.' %}"
+           data-nuevo-tema="{% translate 'Para abrir un tema en el foro necesitas una cuenta.' %}"
+           data-publicar-noticia="{% translate 'Para publicar una noticia necesitas una cuenta.' %}"
+           data-publicar-evento="{% translate 'Para publicar un evento necesitas una cuenta.' %}">{% translate "Para participar necesitas una cuenta." %}</p>
+        <p class="join-note">{% translate "Leer es libre. Registrarse es gratis, se tarda un minuto y no hace falta confirmar el email." %}</p>
+        <div class="join-actions">
+          <a class="btn btn-primary" data-join="signup" href="{% url 'signup' %}">{% translate "Crear cuenta gratis" %}</a>
+          <a class="btn btn-secondary" data-join="login" href="{% url 'login' %}">{% translate "Ya tengo cuenta: entrar" %}</a>
+        </div>
+      </div>
+    </dialog>
+  {% endif %}
 
   <script src="{% static 'js/site.js' %}" defer></script>
   {% block scripts %}{% endblock %}

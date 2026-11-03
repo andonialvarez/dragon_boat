@@ -4,7 +4,7 @@
 {% block description %}{{ article.summary }}{% endblock %}
 {% block og_title %}{{ article.title }}{% endblock %}
 {% block og_description %}{{ article.summary }}{% endblock %}
-{% block og_image %}{% if article.cover_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ article.cover_image.url }}">{% endif %}{% endblock %}
+{% block og_image %}{% if article.cover_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ article.cover_image.url }}">{% elif article.image_url %}<meta property="og:image" content="{{ article.image_url }}">{% endif %}{% endblock %}
 
 {% block content %}
 <div class="wrap page">
@@ -38,12 +38,14 @@
       {% if article.status == "pendiente" %}
         <p class="notice warn">{% translate "Esta noticia está pendiente de revisión: solo la ves tú y el equipo de la web." %}</p>
       {% endif %}
-      {% if article.cover_image and not article.is_external %}
-        <figure class="article-figure">
-          {% include "includes/media.html" with image=article.cover_image sport=article.sport alt=article.image_caption|default:article.title %}
-          {% if article.image_caption %}<figcaption>{{ article.image_caption }}</figcaption>{% endif %}
-        </figure>
-      {% endif %}
+      <figure class="article-figure">
+        {% include "includes/media.html" with image=article.cover_image image_url=article.image_url sport=article.sport alt=article.image_caption|default:article.title seed=article.pk %}
+        {% if article.cover_image and article.image_caption %}
+          <figcaption>{{ article.image_caption }}</figcaption>
+        {% elif article.picture_is_external %}
+          <figcaption class="photo-credit">{% if article.source_name %}{% blocktranslate with source=article.source_name %}Imagen: {{ source }}{% endblocktranslate %}{% else %}{% blocktranslate with source=article.source_url|hostname %}Imagen: {{ source }}{% endblocktranslate %}{% endif %}</figcaption>
+        {% endif %}
+      </figure>
 
       {% if article.is_sample %}
         <p class="sample-note">⚠️ {% translate "Noticia de ejemplo: los equipos, personas y resultados que aparecen son ficticios." %}</p>
@@ -63,7 +65,7 @@
 
       {% if not article.is_external and article.source_name or not article.is_external and article.source_url %}
         <p class="source">{% translate "Fuente:" %}
-          {% if article.source_url %}<a href="{{ article.source_url }}" rel="noopener" target="_blank">{{ article.source_name|default:article.source_url|hostname }}</a>{% else %}{{ article.source_name }}{% endif %}
+          {% if article.source_url %}<a href="{{ article.source_url }}" rel="noopener" target="_blank">{% if article.source_name %}{{ article.source_name }}{% else %}{{ article.source_url|hostname }}{% endif %}</a>{% else %}{{ article.source_name }}{% endif %}
         </p>
       {% endif %}
 
@@ -71,7 +73,6 @@
         <div id="reacciones" style="margin-top:22px">
           <p class="small muted" style="margin-bottom:6px">{% translate "¿Qué te ha parecido?" %}</p>
           {% reaction_bar article %}
-          {% if not user.is_authenticated %}<p class="reaction-hint" style="margin-top:6px">{% translate "Inicia sesión para reaccionar." %}</p>{% endif %}
         </div>
       {% endif %}
 
@@ -91,11 +92,8 @@
               </div>
             </form>
           {% else %}
-            <div class="login-cta" style="margin-bottom:24px">
-              <p>{% translate "Para comentar, responder o reaccionar necesitas una cuenta. Leer es libre." %}</p>
-              <a class="btn btn-primary btn-small" href="{% url 'login' %}?next={{ article.get_absolute_url|urlencode }}%23comentarios">{% translate "Entrar" %}</a>
-              <a class="btn btn-secondary btn-small" href="{% url 'signup' %}?next={{ article.get_absolute_url|urlencode }}%23comentarios">{% translate "Crear cuenta" %}</a>
-            </div>
+            {% translate "Escribe un comentario…" as teaser %}{% translate "Comentar" as button %}
+            {% include "includes/write_teaser.html" with text=teaser button=button action="comentar" next=article.get_absolute_url anchor="#comentarios" %}
           {% endif %}
         {% else %}
           <p class="muted">{% translate "Los comentarios de esta noticia están cerrados." %}</p>
