@@ -167,9 +167,13 @@ python manage.py importar_noticias
 
 Descarta titulares que no contengan las palabras clave de la fuente, los de más de 30 días y los repetidos.
 
-**Para que se ejecute solo** hay un flujo de GitHub Actions (`.github/workflows/importar-noticias.yml`) que **cada lunes por la mañana** pide a la web que importe. Se activa añadiendo dos secretos en GitHub (*Settings › Secrets and variables › Actions*): `SITE_URL` (la dirección de la web) y `NEWS_API_TOKEN` (el mismo valor que en el servidor). La frecuencia se cambia en la línea `cron` del fichero.
+**Para que se ejecute solo** hay un flujo de GitHub Actions (`.github/workflows/importar-noticias.yml`) que **cada lunes por la mañana** pide a la web que importe. Solo necesita el secreto `NEWS_API_TOKEN` en GitHub (*Settings › Secrets and variables › Actions*), con el mismo valor que en Render. La frecuencia se cambia en la línea `cron` del fichero.
 
-### 2. API para publicar resúmenes
+### 2. Resumen semanal escrito por Claude y API
+
+Cada lunes, una tarea programada de Claude busca las noticias de la semana, escribe un resumen propio de cada una citando la fuente y lo sube a `noticias/semana.json` en la rama `noticias-semanales`. El flujo «Publicar noticias» (`.github/workflows/publicar-noticias.yml`) las publica en la web con la API. El formato está en [`noticias/README.md`](noticias/README.md).
+
+La API también se puede usar directamente:
 
 Pensada para una **tarea programada de Claude** (o cualquier otro programa) que busca noticias, escribe un **resumen propio en castellano** y lo publica citando la fuente. Se activa definiendo `NEWS_API_TOKEN` en el servidor.
 
