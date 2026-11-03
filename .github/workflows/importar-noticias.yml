@@ -3,10 +3,11 @@ name: Importar noticias
 # Pide a la web que importe titulares de sus fuentes RSS una vez a la semana:
 # los lunes a las 7:00 UTC (8:00 en invierno y 9:00 en verano, hora peninsular).
 # Para cambiar el día u hora, edita la línea `cron` (minuto hora * * día; 1 = lunes, 2 = martes).
-# Para activarlo, añade en GitHub (Settings > Secrets and variables > Actions):
-#   SITE_URL        -> la dirección de la web, por ejemplo https://dragonboat.onrender.com
-#   NEWS_API_TOKEN  -> el mismo valor que la variable NEWS_API_TOKEN del servidor
-# Sin esos secretos, el trabajo no hace nada.
+# Para activarlo, añade en GitHub (Settings > Secrets and variables > Actions) el
+# secreto NEWS_API_TOKEN, con el mismo valor que la variable NEWS_API_TOKEN de Render.
+# La dirección de la web es https://dragonboat-ih42.onrender.com; si cambia, crea
+# la variable SITE_URL (pestaña «Variables») con la nueva.
+# Sin el secreto, el trabajo falla y GitHub avisa por correo.
 
 on:
   schedule:
@@ -19,13 +20,15 @@ jobs:
     steps:
       - name: Lanzar el importador
         env:
-          SITE_URL: ${{ secrets.SITE_URL }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://dragonboat-ih42.onrender.com' }}
           NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
         run: |
-          if [ -z "$SITE_URL" ] || [ -z "$NEWS_API_TOKEN" ]; then
-            echo "Faltan los secretos SITE_URL y NEWS_API_TOKEN: no se importa nada."
-            exit 0
+          if [ -z "$NEWS_API_TOKEN" ]; then
+            echo "::error::Falta el secreto NEWS_API_TOKEN en GitHub (Settings > Secrets and variables > Actions)."
+            exit 1
           fi
-          curl --fail-with-body --silent --show-error --max-time 120 \
+          # El plan gratuito de Render «se duerme»: primero se despierta la web.
+          curl --silent --output /dev/null --retry 5 --retry-delay 15 --retry-all-errors --max-time 120 "${SITE_URL%/}/robots.txt" || true
+          curl --fail-with-body --silent --show-error --max-time 180 \
             -X POST "${SITE_URL%/}/api/noticias/importar/" \
             -H "Authorization: Bearer $NEWS_API_TOKEN"
