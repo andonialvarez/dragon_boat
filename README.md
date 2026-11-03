@@ -200,9 +200,9 @@ Content-Type: application/json
 
 El repositorio está listo para **[Render](https://render.com)** con el fichero `render.yaml`:
 
-1. Crea una cuenta en Render y conecta tu GitHub.
-2. **New › Blueprint** › elige el repositorio `dragon_boat`. Render crea la web y la base de datos PostgreSQL, y genera `SECRET_KEY` y `NEWS_API_TOKEN`.
-3. Cuando termine, entra en la consola del servicio (**Shell**) y crea tu usuario administrador: `python manage.py createsuperuser`. Si quieres ver los datos de ejemplo allí: `python manage.py cargar_datos_ejemplo`.
+1. Crea una cuenta en Render entrando con tu GitHub.
+2. **New › Blueprint** › elige el repositorio `dragon_boat`. Render lee `render.yaml`, crea la web y la base de datos PostgreSQL, y genera `SECRET_KEY` y `NEWS_API_TOKEN`.
+3. Antes de confirmar, Render pide dos valores: `DJANGO_SUPERUSER_PASSWORD` (la contraseña que quieras para entrar en `/admin/` con el usuario `andoni`) y `DJANGO_SUPERUSER_EMAIL` (tu email). El administrador se crea solo en el primer despliegue; el plan gratuito no tiene consola, así que no hace falta usarla.
 4. Para usar tu propio dominio, añádelo en Render (*Settings › Custom Domains*) y en las variables `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS`.
 
 **Ten en cuenta:**

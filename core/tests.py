@@ -112,3 +112,37 @@ class SampleDataCommandTests(TestCase):
         count = Article.objects.count()
         call_command("cargar_datos_ejemplo", "--reset", verbosity=0)
         self.assertEqual(Article.objects.count(), count)
+
+
+class CreateAdminCommandTests(TestCase):
+    def run_command(self, **env):
+        from io import StringIO
+        from unittest import mock
+
+        with mock.patch.dict("os.environ", env, clear=False):
+            call_command("crear_admin", stdout=StringIO())
+
+    def test_creates_admin_once(self):
+        env = {"DJANGO_SUPERUSER_USERNAME": "andoni", "DJANGO_SUPERUSER_PASSWORD": "Pala-y-Remo-2026!"}
+        self.run_command(**env)
+        user = User.objects.get(username="andoni")
+        self.assertTrue(user.is_superuser and user.is_staff)
+
+        # Un segundo despliegue no cambia la contraseña que se haya puesto desde la web.
+        user.set_password("otra-clave-cambiada-2026")
+        user.save()
+        self.run_command(**env)
+        user.refresh_from_db()
+        self.assertTrue(user.check_password("otra-clave-cambiada-2026"))
+        self.assertEqual(User.objects.count(), 1)
+
+    def test_does_nothing_without_variables(self):
+        self.run_command(DJANGO_SUPERUSER_USERNAME="", DJANGO_SUPERUSER_PASSWORD="")
+        self.assertFalse(User.objects.exists())
+
+    def test_rejects_weak_password(self):
+        from django.core.management.base import CommandError
+
+        with self.assertRaises(CommandError):
+            self.run_command(DJANGO_SUPERUSER_USERNAME="andoni", DJANGO_SUPERUSER_PASSWORD="1234")
+        self.assertFalse(User.objects.exists())

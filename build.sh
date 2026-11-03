@@ -6,3 +6,5 @@ pip install --upgrade pip
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
 python manage.py migrate --no-input
+# Crea el administrador la primera vez (variables DJANGO_SUPERUSER_*).
+python manage.py crear_admin
