@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ category.name }} · {% translate "Foro" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <nav class="breadcrumbs"><a href="{% url 'forum:index' %}">{% translate "Foro" %}</a> /</nav>
+  <header class="page-head with-action">
+    <div>
+      <h1>{{ category.icon }} {{ category.name }}</h1>
+      <p>{{ category.description }}</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'forum:new_topic' category.slug %}">＋ {% translate "Nuevo tema" %}</a>
+  </header>
+
+  {% if topics %}
+    <div class="forum-table">
+      <div class="forum-row head"><span></span><span>{% translate "Tema" %}</span><span class="text-center">{% translate "Respuestas" %}</span><span>{% translate "Último mensaje" %}</span></div>
+      {% for topic in topics %}{% include "includes/topic_row.html" %}{% endfor %}
+    </div>
+    {% include "includes/pagination.html" %}
+  {% else %}
+    {% translate "Todavía no hay temas aquí. ¡Abre el primero!" as msg %}
+    {% include "includes/empty.html" with message=msg icon="💬" %}
+  {% endif %}
+</div>
+{% endblock %}

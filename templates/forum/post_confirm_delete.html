@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Borrar mensaje" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card">
+    <h1>{% translate "¿Borrar este mensaje?" %}</h1>
+    <blockquote class="comment-text">{{ post.body|linebreaks }}</blockquote>
+    <p class="muted small">{% translate "Si es el primer mensaje y nadie ha respondido, se borrará el tema entero. Si hay respuestas, se mantendrán." %}</p>
+    <form method="post" class="form-actions">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">{% translate "Sí, borrar" %}</button>
+      <a href="{{ post.get_absolute_url }}">{% translate "Cancelar" %}</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

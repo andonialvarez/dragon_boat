@@ -1,0 +1,9 @@
+# Dependencias de la web. Instálalas con: pip install -r requirements.txt
+Django>=5.2,<5.3            # Versión LTS (soporte hasta abril de 2028)
+Pillow>=11.0                # Imágenes subidas (noticias, eventos, foro)
+whitenoise>=6.7             # Sirve CSS, JS e imágenes de la web en producción
+dj-database-url>=2.2        # Lee la base de datos de la variable DATABASE_URL
+psycopg[binary]>=3.2        # PostgreSQL (producción)
+python-dotenv>=1.0          # Lee el fichero .env en local
+feedparser>=6.0             # Importador de noticias RSS/Atom
+gunicorn>=23.0; sys_platform != "win32"   # Servidor web en producción (Linux)

@@ -1,0 +1,26 @@
+{% load i18n site_tags %}
+<li class="event-row{% if event.status == 'cancelado' %} is-cancelled{% endif %}" style="--sport: {{ event.sport.color }}">
+  <div class="date-block" aria-hidden="true">
+    <span class="day">{{ event.start_date|date:"j" }}</span>
+    <span class="month">{{ event.start_date|date:"M" }}</span>
+    <span class="year">{{ event.start_date|date:"Y" }}</span>
+  </div>
+  <div>
+    <h3><a class="card-link" href="{{ event.get_absolute_url }}">{{ event.title }}</a></h3>
+    <div class="meta">
+      <span>📅 {% date_range event.start_date event.end_date %}</span>
+      {% if event.city %}<span>📍 {{ event.city }}{% if event.country and event.country != "España" %} ({{ event.country }}){% endif %}</span>{% endif %}
+      {% if not compact and event.distances %}<span>📏 {{ event.distances }}</span>{% endif %}
+    </div>
+  </div>
+  {% if not compact %}
+    <div class="event-side badges">
+      {% include "includes/sample_badge.html" with obj=event %}
+      {% if event.status != "programado" %}<span class="badge badge-red">{{ event.get_status_display }}</span>{% endif %}
+      <span class="chip">{{ event.sport.icon }} {{ event.sport.name }}</span>
+      <span class="badge">{{ event.get_kind_display }}</span>
+    </div>
+  {% else %}
+    {% if event.is_sample %}<div class="event-side">{% include "includes/sample_badge.html" with obj=event %}</div>{% endif %}
+  {% endif %}
+</li>

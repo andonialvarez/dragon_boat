@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load i18n humanize site_tags %}
+{% block title %}{{ person.get_username }}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="profile-head">
+    {% avatar person "large" %}
+    <div>
+      <div class="badges">{% if person.is_staff %}<span class="badge">{% translate "Equipo de la web" %}</span>{% endif %}{% if profile.is_sample %}<span class="badge badge-sample">{% translate "Usuario de ejemplo" %}</span>{% endif %}</div>
+      <h1>{{ person.get_username }}</h1>
+      <p class="muted mb-0">
+        {% if profile.club %}🛶 {{ profile.club }} · {% endif %}{% if profile.city %}📍 {{ profile.city }} · {% endif %}
+        {% blocktranslate with date=person.date_joined|date:"F Y" %}Miembro desde {{ date }}{% endblocktranslate %}
+      </p>
+      <ul class="stat-row">
+        <li><strong>{{ post_count }}</strong><span class="small muted">{% translate "mensajes en el foro" %}</span></li>
+        <li><strong>{{ comment_count }}</strong><span class="small muted">{% translate "comentarios" %}</span></li>
+        <li><strong>{{ article_count }}</strong><span class="small muted">{% translate "noticias" %}</span></li>
+      </ul>
+    </div>
+    {% if user == person %}<a class="btn btn-secondary btn-small" href="{% url 'profile_edit' %}" style="margin-left:auto">{% translate "Editar perfil" %}</a>{% endif %}
+  </header>
+
+  {% if profile.bio or profile.favorite_sport %}
+    <div class="panel" style="margin-top:22px">
+      {% if profile.favorite_sport %}<p class="mb-0"><span class="chip" style="--sport: {{ profile.favorite_sport.color }}">{{ profile.favorite_sport.icon }} {{ profile.favorite_sport.name }}</span></p>{% endif %}
+      {% if profile.bio %}<div style="margin-top:10px">{{ profile.bio|linebreaks }}</div>{% endif %}
+    </div>
+  {% endif %}
+
+  {% if user == person and my_pending %}
+    <section class="section">
+      <h2>{% translate "Tus publicaciones pendientes de revisión" %}</h2>
+      <ul class="plain-list panel">
+        {% for item in my_pending %}<li><a href="{{ item.get_absolute_url }}">{{ item }}</a></li>{% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <div class="layout-2 section">
+    <section>
+      <h2>{% translate "Últimos mensajes en el foro" %}</h2>
+      {% if recent_posts %}
+        <ul class="plain-list panel">
+          {% for post in recent_posts %}
+            <li><a href="{{ post.get_absolute_url }}">{{ post.topic.title }}</a><div class="small muted">{{ post.body|truncatewords:20 }} · {{ post.created_at|naturaltime }}</div></li>
+          {% endfor %}
+        </ul>
+      {% else %}<p class="muted">{% translate "Todavía no ha escrito en el foro." %}</p>{% endif %}
+    </section>
+    <section>
+      <h2>{% translate "Noticias publicadas" %}</h2>
+      {% if recent_articles %}
+        <ul class="plain-list panel">
+          {% for article in recent_articles %}<li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a><div class="small muted">{{ article.published_at|date:"j M Y"|lower }}</div></li>{% endfor %}
+        </ul>
+      {% else %}<p class="muted">{% translate "Todavía no ha publicado noticias." %}</p>{% endif %}
+      <h2 style="margin-top:22px">{% translate "Últimos comentarios" %}</h2>
+      {% if recent_comments %}
+        <ul class="plain-list panel">
+          {% for comment in recent_comments %}
+            <li><a href="{{ comment.get_absolute_url }}">{{ comment.article.title }}</a><div class="small muted">{{ comment.body|truncatewords:16 }} · {{ comment.created_at|naturaltime }}</div></li>
+          {% endfor %}
+        </ul>
+      {% else %}<p class="muted">{% translate "Todavía no ha comentado." %}</p>{% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

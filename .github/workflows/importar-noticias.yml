@@ -1,0 +1,31 @@
+name: Importar noticias
+
+# Pide a la web que importe titulares de sus fuentes RSS una vez a la semana:
+# los lunes a las 7:00 UTC (8:00 en invierno y 9:00 en verano, hora peninsular).
+# Para cambiar el día u hora, edita la línea `cron` (minuto hora * * día; 1 = lunes, 2 = martes).
+# Para activarlo, añade en GitHub (Settings > Secrets and variables > Actions):
+#   SITE_URL        -> la dirección de la web, por ejemplo https://dragonboat.onrender.com
+#   NEWS_API_TOKEN  -> el mismo valor que la variable NEWS_API_TOKEN del servidor
+# Sin esos secretos, el trabajo no hace nada.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  importar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lanzar el importador
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
+        run: |
+          if [ -z "$SITE_URL" ] || [ -z "$NEWS_API_TOKEN" ]; then
+            echo "Faltan los secretos SITE_URL y NEWS_API_TOKEN: no se importa nada."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 120 \
+            -X POST "${SITE_URL%/}/api/noticias/importar/" \
+            -H "Authorization: Bearer $NEWS_API_TOKEN"

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Campeonatos y clasificaciones" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <header class="page-head">
+    <h1>{% translate "Campeonatos y clasificaciones" %}</h1>
+    <p>{% translate "Ligas, campeonatos y regatas con sus clasificaciones por categoría y los equipos que participan." %}</p>
+  </header>
+
+  <nav class="filters" aria-label="{% translate 'Filtrar por deporte' %}">
+    <a href="?{% if current_season %}temporada={{ current_season }}{% endif %}" {% if not current_sport %}class="active"{% endif %}>{% translate "Todos los deportes" %}</a>
+    {% for sport in nav_sports %}
+      <a href="?deporte={{ sport.slug }}{% if current_season %}&amp;temporada={{ current_season }}{% endif %}" {% if current_sport == sport %}class="active"{% endif %}>{{ sport.icon }} {{ sport.name }}</a>
+    {% endfor %}
+  </nav>
+  {% if seasons|length > 1 %}
+    <nav class="filters" aria-label="{% translate 'Filtrar por temporada' %}">
+      <a href="?{% if current_sport %}deporte={{ current_sport.slug }}{% endif %}" {% if not current_season %}class="active"{% endif %}>{% translate "Todas las temporadas" %}</a>
+      {% for season in seasons %}
+        <a href="?temporada={{ season }}{% if current_sport %}&amp;deporte={{ current_sport.slug }}{% endif %}" {% if current_season == season|stringformat:"s" %}class="active"{% endif %}>{{ season }}</a>
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  {% if championships %}
+    <div class="grid grid-3">
+      {% for c in championships %}
+        <article class="card" style="--sport: {{ c.sport.color }}">
+          {% include "includes/sample_badge.html" with obj=c corner=True %}
+          {% include "includes/media.html" with image=c.cover_image sport=c.sport alt=c.name %}
+          <div class="card-body">
+            <div class="badges">
+              <span class="chip">{{ c.sport.icon }} {{ c.sport.name }}</span>
+              <span class="badge">{{ c.get_scope_display }}</span>
+              {% if c.status_label %}<span class="badge{% if c.status == 'en_curso' %} badge-ok{% endif %}">{{ c.status_label }}</span>{% endif %}
+            </div>
+            <h2 class="card-title"><a class="card-link" href="{{ c.get_absolute_url }}">{{ c.name }}</a></h2>
+            {% if c.description %}<p>{{ c.description|truncatewords:24 }}</p>{% endif %}
+            <div class="meta">
+              <span>🗓 {{ c.season }}</span>
+              {% if c.location %}<span>📍 {{ c.location }}</span>{% endif %}
+              <span>👥 {% blocktranslate count counter=c.team_count %}{{ counter }} equipo{% plural %}{{ counter }} equipos{% endblocktranslate %}</span>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+    {% include "includes/pagination.html" %}
+  {% else %}
+    {% translate "Todavía no hay campeonatos con estos filtros." as msg %}
+    {% include "includes/empty.html" with message=msg icon="🏆" %}
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Sin permiso" %}{% endblock %}
+{% block content %}
+<div class="wrap error-page">
+  <div class="code">403</div>
+  <h1>{% translate "No tienes permiso para hacer esto" %}</h1>
+  <p class="muted">{% translate "Solo puedes modificar lo que has publicado tú." %}</p>
+  <a class="btn btn-primary" href="{% url 'home' %}">{% translate "Volver a la portada" %}</a>
+</div>
+{% endblock %}

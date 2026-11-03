@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ team.name }}{% endblock %}
+{% block description %}{{ team.description|truncatewords:30 }}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <nav class="breadcrumbs"><a href="{% url 'team_list' %}">{% translate "Equipos" %}</a> /</nav>
+  {% with sport=team.sports.all.0 %}
+  <header class="profile-head" {% if sport %}style="--sport: {{ sport.color }}"{% endif %}>
+    <div class="team-logo large">{% if team.logo %}<img src="{{ team.logo.url }}" alt="{% blocktranslate with name=team.name %}Escudo de {{ name }}{% endblocktranslate %}">{% else %}{{ team.initials }}{% endif %}</div>
+    <div>
+      <div class="badges">{% include "includes/sample_badge.html" with obj=team %}{% for s in team.sports.all %}<span class="chip" style="--sport: {{ s.color }}">{{ s.icon }} {{ s.name }}</span>{% endfor %}</div>
+      <h1>{{ team.name }}</h1>
+      <p class="origin-line">📍 {{ team.origin }}{% if team.founded_year %} · {% blocktranslate with year=team.founded_year %}Fundado en {{ year }}{% endblocktranslate %}{% endif %}</p>
+    </div>
+  </header>
+  {% endwith %}
+
+  <div class="layout-article" style="margin-top:28px">
+    <div class="stack">
+      {% if team.description %}<div class="prose">{{ team.description|urlize|linebreaks }}</div>{% endif %}
+      <section aria-labelledby="t-resultados">
+        <h2 id="t-resultados">{% translate "Resultados" %}</h2>
+        {% if results %}
+          <div class="table-wrap">
+            <table class="standings">
+              <thead><tr><th>{% translate "Puesto" %}</th><th>{% translate "Campeonato" %}</th><th>{% translate "Categoría" %}</th><th class="num">{% translate "Puntos / tiempo" %}</th></tr></thead>
+              <tbody>
+                {% for r in results %}
+                  <tr>
+                    <td><span class="pos pos-{{ r.position }}">{{ r.position }}</span></td>
+                    <td class="team-name"><a href="{{ r.division.championship.get_absolute_url }}">{{ r.division.championship.name }}</a><span class="origin">{{ r.division.championship.season }}</span></td>
+                    <td>{{ r.division.name }}</td>
+                    <td class="num">{% if r.points is not None %}{{ r.points|floatformat:"-2" }} pts{% endif %}{% if r.points is not None and r.result_time %} · {% endif %}{{ r.result_time }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="muted">{% translate "Todavía no hay resultados de este equipo." %}</p>
+        {% endif %}
+      </section>
+    </div>
+    <aside class="stack">
+      <section class="panel">
+        <h3>{% translate "Ficha" %}</h3>
+        <dl class="facts">
+          {% if team.city %}<dt>{% translate "Localidad" %}</dt><dd>{{ team.city }}</dd>{% endif %}
+          {% if team.region %}<dt>{% translate "Zona" %}</dt><dd>{{ team.region }}</dd>{% endif %}
+          <dt>{% translate "País" %}</dt><dd>{{ team.country }}</dd>
+          {% if team.founded_year %}<dt>{% translate "Fundación" %}</dt><dd>{{ team.founded_year }}</dd>{% endif %}
+          {% if team.website %}<dt>{% translate "Web" %}</dt><dd><a href="{{ team.website }}" target="_blank" rel="noopener">{{ team.website }}</a></dd>{% endif %}
+        </dl>
+      </section>
+      {% if upcoming_events %}
+        <section class="panel">
+          <h3>📅 {% translate "Próximas citas" %}</h3>
+          <ul class="event-list event-compact">{% for event in upcoming_events %}{% include "includes/event_row.html" with compact=True %}{% endfor %}</ul>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

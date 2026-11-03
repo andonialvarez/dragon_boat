@@ -1,0 +1,17 @@
+{% load i18n %}
+{% with sport=team.sports.all.0 %}
+<article class="card team-card" {% if sport %}style="--sport: {{ sport.color }}"{% endif %}>
+  <div class="card-body">
+    <div class="team-logo">{% if team.logo %}<img src="{{ team.logo.url }}" alt="">{% else %}{{ team.initials }}{% endif %}</div>
+    <div>
+      <h3 class="card-title"><a class="card-link" href="{{ team.get_absolute_url }}">{{ team.name }}</a></h3>
+      {% if team.origin %}<p class="origin-line">📍 {{ team.origin }}</p>{% endif %}
+      {% if show_description and team.description %}<p class="small">{{ team.description|truncatewords:22 }}</p>{% endif %}
+      <div class="badges" style="margin-top:6px">
+        {% include "includes/sample_badge.html" with obj=team %}
+        {% for s in team.sports.all %}<span class="chip" style="--sport: {{ s.color }}">{{ s.icon }} {{ s.name }}</span>{% endfor %}
+      </div>
+    </div>
+  </div>
+</article>
+{% endwith %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Borrar comentario" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card">
+    <h1>{% translate "¿Borrar este comentario?" %}</h1>
+    <blockquote class="comment-text">{{ comment.body|linebreaks }}</blockquote>
+    <p class="muted small">{% translate "Si tiene respuestas, se mantendrán y en su lugar aparecerá «Comentario borrado por su autor»." %}</p>
+    <form method="post" class="form-actions">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">{% translate "Sí, borrar" %}</button>
+      <a href="{{ comment.get_absolute_url }}">{% translate "Cancelar" %}</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

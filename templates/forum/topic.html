@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n humanize site_tags reactions_tags %}
+{% block title %}{{ topic.title }} · {% translate "Foro" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <nav class="breadcrumbs"><a href="{% url 'forum:index' %}">{% translate "Foro" %}</a> / <a href="{{ category.get_absolute_url }}">{{ category.name }}</a> /</nav>
+  <header class="page-head">
+    <div class="badges" style="margin-bottom:8px">
+      {% include "includes/sample_badge.html" with obj=topic %}
+      {% if topic.is_pinned %}<span class="badge">📌 {% translate "Fijado" %}</span>{% endif %}
+      {% if topic.is_locked %}<span class="badge">🔒 {% translate "Cerrado" %}</span>{% endif %}
+    </div>
+    <h1>{{ topic.title }}</h1>
+  </header>
+
+  {% for post in posts %}
+    <article class="post" id="mensaje-{{ post.pk }}">
+      <div class="post-author">
+        {% avatar post.author %}
+        <div>
+          <a class="name" href="{% url 'profile_detail' post.author.get_username %}">{{ post.author.get_username }}</a>
+          <div class="extra">
+            {% if post.author.is_staff %}<span class="badge">{% translate "Equipo" %}</span>{% elif post.author_id == topic.author_id %}<span class="badge">{% translate "Autor del tema" %}</span>{% endif %}
+            {% if post.author.profile.club %}<div>{{ post.author.profile.club }}</div>{% endif %}
+            {% if post.author.profile.city %}<div>📍 {{ post.author.profile.city }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="post-main">
+        <div class="post-meta">
+          <time datetime="{{ post.created_at|date:'c' }}" title="{{ post.created_at|date:'j M Y, H:i' }}">{{ post.created_at|naturaltime }}</time>
+          <span>{% if post.is_visible and post.was_edited %}{% translate "editado" %} · {% endif %}<a href="{{ post.get_absolute_url }}">#{{ forloop.counter0|add:page_obj.start_index }}</a></span>
+        </div>
+        {% if post.is_hidden %}
+          <div class="post-text removed">{% translate "Mensaje retirado por moderación." %}</div>
+        {% elif post.is_deleted %}
+          <div class="post-text removed">{% translate "Mensaje borrado por su autor." %}</div>
+        {% else %}
+          <div class="post-text">{{ post.body|urlize|linebreaks }}</div>
+          {% if post.image %}<a class="post-image" href="{{ post.image.url }}" target="_blank" rel="noopener"><img src="{{ post.image.url }}" alt="{% translate 'Imagen adjunta' %}" loading="lazy"></a>{% endif %}
+          <div class="post-footer">
+            {% reaction_bar post compact=True %}
+            {% if user.is_authenticated and user.pk == post.author_id %}
+              <span class="own-actions">
+                <a href="{% url 'forum:post_edit' post.pk %}">{% translate "Editar" %}</a>
+                <a href="{% url 'forum:post_delete' post.pk %}">{% translate "Borrar" %}</a>
+              </span>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+
+  {% include "includes/pagination.html" %}
+
+  <section id="responder" class="section">
+    {% if topic.is_locked %}
+      <p class="notice">🔒 {% translate "Este tema está cerrado y no admite más respuestas." %}</p>
+    {% elif user.is_authenticated %}
+      <form class="panel" action="{% url 'forum:reply' topic.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2 style="font-size:1.2rem">{% translate "Responder" %}</h2>
+        {% include "includes/form_errors.html" %}
+        {% include "includes/field.html" with field=form.body %}
+        {% include "includes/field.html" with field=form.image %}
+        <div class="form-actions"><button class="btn btn-primary" type="submit">{% translate "Publicar respuesta" %}</button></div>
+      </form>
+    {% else %}
+      <div class="login-cta">
+        <p>{% translate "Para responder necesitas una cuenta. Es gratis y tardas un minuto." %}</p>
+        <a class="btn btn-primary btn-small" href="{% url 'login' %}?next={{ topic.get_absolute_url|urlencode }}%23responder">{% translate "Entrar" %}</a>
+        <a class="btn btn-secondary btn-small" href="{% url 'signup' %}?next={{ topic.get_absolute_url|urlencode }}%23responder">{% translate "Crear cuenta" %}</a>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

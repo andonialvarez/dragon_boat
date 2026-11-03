@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if is_new %}{% translate "Publicar una noticia" %}{% else %}{% translate "Editar noticia" %}{% endif %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card wide">
+    <nav class="breadcrumbs"><a href="{% if article %}{{ article.get_absolute_url }}{% else %}{% url 'article_list' %}{% endif %}">← {% if article %}{{ article.title }}{% else %}{% translate "Noticias" %}{% endif %}</a></nav>
+    <h1>{% if is_new %}📰 {% translate "Publicar una noticia" %}{% else %}{% translate "Editar noticia" %}{% endif %}</h1>
+    {% if is_new %}
+      <p class="muted">{% translate "Cuenta lo que pasa en tu club, una regata, un fichaje o cualquier novedad del mundo del remo y la pala. Se publicará con tu nombre de usuario." %}</p>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      <div class="form-grid">
+        {% include "includes/field.html" with field=form.sport %}
+        {% include "includes/field.html" with field=form.category %}
+      </div>
+      {% include "includes/field.html" with field=form.title %}
+      {% include "includes/field.html" with field=form.summary %}
+      {% include "includes/field.html" with field=form.body %}
+      <fieldset>
+        <legend>{% translate "Imagen" %}</legend>
+        {% include "includes/field.html" with field=form.cover_image %}
+        {% include "includes/field.html" with field=form.image_caption %}
+      </fieldset>
+      <fieldset>
+        <legend>{% translate "Fuente" %}</legend>
+        <div class="form-grid">
+          {% include "includes/field.html" with field=form.source_name %}
+          {% include "includes/field.html" with field=form.source_url %}
+        </div>
+      </fieldset>
+      <p class="small muted">{% blocktranslate %}Al publicar aceptas las normas de la comunidad. No copies noticias enteras de otros medios: resume con tus palabras y enlaza la fuente.{% endblocktranslate %} <a href="{% url 'rules' %}">{% translate "Normas" %}</a></p>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% if is_new %}{% translate "Publicar" %}{% else %}{% translate "Guardar cambios" %}{% endif %}</button>
+        <a href="{% if article %}{{ article.get_absolute_url }}{% else %}{% url 'article_list' %}{% endif %}">{% translate "Cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

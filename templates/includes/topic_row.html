@@ -1,0 +1,26 @@
+{% load i18n humanize %}
+<div class="forum-row">
+  <div class="icon" aria-hidden="true">{% if topic.is_pinned %}📌{% elif topic.is_locked %}🔒{% else %}{{ topic.category.icon|default:"💬" }}{% endif %}</div>
+  <div>
+    <h3>
+      {% if topic.is_pinned or topic.is_locked or topic.is_sample %}
+        <span class="topic-flags">
+          {% if topic.is_pinned %}<span class="badge">{% translate "Fijado" %}</span>{% endif %}
+          {% if topic.is_locked %}<span class="badge">{% translate "Cerrado" %}</span>{% endif %}
+          {% include "includes/sample_badge.html" with obj=topic %}
+        </span>
+      {% endif %}
+      <a class="card-link" href="{{ topic.get_absolute_url }}">{{ topic.title }}</a>
+    </h3>
+    <p>
+      {% blocktranslate with author=topic.author.get_username %}por {{ author }}{% endblocktranslate %}
+      {% if show_category %} · {{ topic.category.name }}{% endif %}
+    </p>
+    <span class="mobile-meta">💬 {{ topic.reply_count }} · {{ topic.last_activity_at|naturaltime }}</span>
+  </div>
+  <div class="count">{{ topic.reply_count }}<small>{% blocktranslate count counter=topic.reply_count %}respuesta{% plural %}respuestas{% endblocktranslate %}</small></div>
+  <div class="last">
+    {{ topic.last_activity_at|naturaltime }}<br>
+    {% if topic.last_author %}{% blocktranslate with author=topic.last_author %}por {{ author }}{% endblocktranslate %}{% endif %}
+  </div>
+</div>

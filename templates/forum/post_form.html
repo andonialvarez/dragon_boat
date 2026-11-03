@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Editar mensaje" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card wide">
+    <nav class="breadcrumbs"><a href="{{ post.get_absolute_url }}">← {{ post.topic.title }}</a></nav>
+    <h1>{% translate "Editar mensaje" %}</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% if title_form %}{% include "includes/form_errors.html" with form=title_form %}{% for field in title_form %}{% include "includes/field.html" %}{% endfor %}{% endif %}
+      {% include "includes/form_errors.html" %}
+      {% for field in form %}{% include "includes/field.html" %}{% endfor %}
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% translate "Guardar cambios" %}</button>
+        <a href="{{ post.get_absolute_url }}">{% translate "Cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ sport.name }}{% endblock %}
+{% block description %}{{ sport.tagline }}{% endblock %}
+{% block content %}
+<section class="sport-hero" style="--sport: {{ sport.color }}">
+  <div class="wrap">
+    <nav class="breadcrumbs"><a href="{% url 'sport_list' %}">{% translate "Deportes" %}</a> /</nav>
+    <h1><span aria-hidden="true">{{ sport.icon }}</span> {{ sport.name }}</h1>
+    <p>{{ sport.tagline }}</p>
+  </div>
+</section>
+<div class="wrap page">
+  <div class="layout-article">
+    <div>
+      <div class="prose">{{ sport.description|linebreaks }}</div>
+
+      {% if articles %}
+        <section class="section" aria-labelledby="t-noticias">
+          <div class="section-head"><h2 id="t-noticias">{% translate "Noticias" %}</h2><a href="{% url 'article_list' %}?deporte={{ sport.slug }}">{% translate "Ver todas" %} →</a></div>
+          <div class="grid">{% for article in articles %}{% include "includes/article_card.html" %}{% endfor %}</div>
+        </section>
+      {% endif %}
+
+      {% if events %}
+        <section class="section" aria-labelledby="t-eventos">
+          <div class="section-head"><h2 id="t-eventos">{% translate "Próximos eventos" %}</h2><a href="{% url 'event_list' %}?deporte={{ sport.slug }}">{% translate "Calendario" %} →</a></div>
+          <ul class="event-list">{% for event in events %}{% include "includes/event_row.html" %}{% endfor %}</ul>
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="stack">
+      <section class="panel">
+        <h3>{% translate "En pocas palabras" %}</h3>
+        <dl class="facts">
+          <dt>{% translate "Propulsión" %}</dt><dd>{{ sport.get_propulsion_display }}</dd>
+          {% if sport.crew %}<dt>{% translate "Tripulación" %}</dt><dd>{{ sport.crew }}</dd>{% endif %}
+          {% if sport.distances %}<dt>{% translate "Distancias" %}</dt><dd>{{ sport.distances }}</dd>{% endif %}
+          {% if sport.governing_bodies %}<dt>{% translate "Organismos" %}</dt><dd>{{ sport.governing_bodies }}</dd>{% endif %}
+        </dl>
+      </section>
+
+      {% if championships %}
+        <section class="panel">
+          <h3>🏆 {% translate "Campeonatos" %}</h3>
+          <ul class="plain-list">
+            {% for c in championships %}
+              <li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a> {% include "includes/sample_badge.html" with obj=c %}<div class="small muted">{{ c.season }} · {{ c.get_scope_display }}</div></li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      {% if teams %}
+        <section class="panel">
+          <h3>{% translate "Equipos" %}</h3>
+          <ul class="plain-list">
+            {% for team in teams %}<li><a href="{{ team.get_absolute_url }}">{{ team.name }}</a><div class="small muted">{{ team.origin }}</div></li>{% endfor %}
+          </ul>
+          <p class="small mb-0" style="margin-top:10px"><a href="{% url 'team_list' %}?deporte={{ sport.slug }}">{% translate "Todos los equipos" %} →</a></p>
+        </section>
+      {% endif %}
+
+      {% if forum_categories %}
+        <section class="panel">
+          <h3>💬 {% translate "Habla de ello en el foro" %}</h3>
+          <ul class="plain-list">{% for c in forum_categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.icon }} {{ c.name }}</a></li>{% endfor %}</ul>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
