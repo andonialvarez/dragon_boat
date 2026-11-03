@@ -186,7 +186,19 @@ p {
   z-index: 50;
   background: var(--navy);
   color: #fff;
-  border-bottom: 3px solid var(--red);
+}
+
+.site-header::after {
+  /* El borde del casco de un barco dragón: rojo con remaches dorados. */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 7px;
+  background: radial-gradient(circle, var(--gold) 1.6px, transparent 2.2px) 0 50% / 16px 7px repeat-x, var(--red);
+  box-shadow: 0 3px 8px rgba(12, 32, 53, 0.18);
+  pointer-events: none;
 }
 
 .site-header .wrap {
@@ -741,12 +753,30 @@ p {
   gap: 10px;
 }
 
+.section-head h2 {
+  position: relative;
+  padding-bottom: 14px;
+}
+
+.section-head h2::after {
+  /* Pincelada de olas dorada bajo el título */
+  content: "";
+  position: absolute;
+  left: calc(1.45em + 10px);
+  bottom: 0;
+  width: 132px;
+  height: 9px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 9'%3E%3Cpath d='M2 6 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0' fill='none' stroke='%23e8a33d' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat;
+}
+
 .section-head h2::before {
   content: "";
-  width: 6px;
-  height: 1.05em;
-  border-radius: 3px;
-  background: var(--red);
+  flex: none;
+  width: 1.45em;
+  height: 1.45em;
+  border-radius: 50%;
+  background: url("../img/logo.svg") center / contain no-repeat;
+  box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.35);
 }
 
 .section-head a {
@@ -881,36 +911,52 @@ p {
   margin-top: 20px;
 }
 
-/* Imagen o marcador de color del deporte */
+/* Imagen: ilustración del deporte de fondo y, encima, la foto si la hay */
 .media {
   position: relative;
   aspect-ratio: 16 / 9;
   background: var(--sport, var(--teal));
   overflow: hidden;
+  isolation: isolate;
 }
 
 .media img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
 }
 
-.media-placeholder {
-  display: grid;
-  place-items: center;
-  height: 100%;
-  font-size: 3rem;
-  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25), transparent 50%),
-    linear-gradient(135deg, var(--sport, var(--teal)), rgba(12, 32, 53, 0.92));
+.card:hover .media img {
+  transform: scale(1.04);
 }
 
-.media-placeholder::after {
-  content: "";
+.media-credit {
+  display: none;
   position: absolute;
-  inset: auto 0 0 0;
-  height: 36%;
-  background: url("../img/waves.svg") repeat-x bottom / 240px 100%;
-  opacity: 0.35;
+  right: 8px;
+  bottom: 8px;
+  z-index: 1;
+  max-width: calc(100% - 16px);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: #fff;
+  background: rgba(8, 20, 34, 0.62);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.media-photo ~ .media-credit {
+  display: block;
+}
+
+.photo-credit {
+  font-size: 0.8rem;
 }
 
 /* Noticia destacada */
@@ -1629,11 +1675,6 @@ table.standings {
   opacity: 1;
 }
 
-.reaction-hint {
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-
 /* ---------- Comentarios ---------- */
 
 .comments {
@@ -1726,22 +1767,6 @@ table.standings {
 
 .reply-form[hidden] {
   display: none;
-}
-
-.login-cta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 18px;
-  background: var(--surface);
-  border: 1px dashed var(--teal);
-  border-radius: var(--radius);
-}
-
-.login-cta p {
-  margin: 0;
-  flex: 1 1 260px;
 }
 
 :target > .comment-body > .comment-text,
@@ -2271,7 +2296,7 @@ textarea:focus {
 .site-footer {
   background: var(--navy);
   color: #b9c9da;
-  margin-top: 40px;
+  margin-top: 70px;
   font-size: 0.92rem;
 }
 
@@ -2502,5 +2527,457 @@ legend {
   .pagination span {
     min-width: 44px;
     min-height: 44px;
+  }
+}
+
+/* ==========================================================================
+   Decoración: agua, escamas de dragón y el barco que cruza la web
+   ========================================================================== */
+
+:root {
+  --sea-soft: #e3f1ef;
+  --sea-line: #cfe5e2;
+  --scales: radial-gradient(circle at 50% 120%, transparent 58%, rgba(255, 255, 255, 0.06) 60%, rgba(255, 255, 255, 0.06) 68%, transparent 70%);
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60' viewBox='0 0 160 60'%3E%3Cpath d='M0 20 q20 -10 40 0 t40 0 t40 0 t40 0 M-40 50 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0' fill='none' stroke='%230c2035' stroke-opacity='.045' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sea-soft: #0f2233;
+    --sea-line: #1d3449;
+    --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60' viewBox='0 0 160 60'%3E%3Cpath d='M0 20 q20 -10 40 0 t40 0 t40 0 t40 0 M-40 50 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0' fill='none' stroke='%23ffffff' stroke-opacity='.035' stroke-width='2'/%3E%3C/svg%3E");
+  }
+}
+
+body {
+  background-image: var(--texture);
+  background-size: 160px 60px;
+}
+
+/* ---------- Portada: mar en movimiento ---------- */
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scales) 0 0 / 34px 22px, var(--scales) 17px 11px / 34px 22px;
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(100deg, transparent 15%, #000 70%);
+  mask-image: linear-gradient(100deg, transparent 15%, #000 70%);
+  pointer-events: none;
+}
+
+.hero .wrap {
+  position: relative;
+}
+
+.hero h1 em {
+  background: linear-gradient(transparent 70%, rgba(200, 16, 46, 0.55) 70%, rgba(200, 16, 46, 0.55) 92%, transparent 92%);
+  padding: 0 0.08em;
+}
+
+.hero-art img {
+  transform-origin: 50% 80%;
+  animation: bob 6s ease-in-out infinite;
+}
+
+.hero-sea {
+  position: relative;
+  height: 64px;
+  margin-top: -28px;
+  overflow: hidden;
+}
+
+.sea-layer {
+  position: absolute;
+  left: 0;
+  width: 200%;
+  height: 40px;
+  background-repeat: repeat-x;
+  background-size: 300px 40px;
+  animation: drift 26s linear infinite;
+}
+
+.sea-back {
+  bottom: 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 40'%3E%3Cpath d='M0 22 q37.5 -16 75 0 t75 0 t75 0 t75 0 V40 H0 Z' fill='%23138f99' fill-opacity='.35'/%3E%3C/svg%3E");
+}
+
+.sea-mid {
+  bottom: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 40'%3E%3Cpath d='M0 22 q37.5 -14 75 0 t75 0 t75 0 t75 0 V40 H0 Z' fill='%230d6a73' fill-opacity='.55'/%3E%3Cpath d='M30 20 q8 -4 16 0 M180 24 q8 -4 16 0' stroke='%23ffffff' stroke-opacity='.5' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+
+.hero-sea .hero-waves {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin: 0;
+}
+
+@keyframes drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-300px); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  50% { transform: translateY(5px) rotate(0.6deg); }
+}
+
+/* ---------- Bandas de color con borde de ola ---------- */
+
+.band {
+  position: relative;
+  margin: 36px 0;
+  background: var(--sea-soft);
+  background-image: var(--texture);
+  background-size: 160px 60px;
+}
+
+.band::before,
+.band::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22px;
+  background: var(--sea-soft);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 22' preserveAspectRatio='none'%3E%3Cpath d='M0 22 V12 q30 -12 60 0 t60 0 V22 Z'/%3E%3C/svg%3E") repeat-x 0 0 / 120px 22px;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 22' preserveAspectRatio='none'%3E%3Cpath d='M0 22 V12 q30 -12 60 0 t60 0 V22 Z'/%3E%3C/svg%3E") repeat-x 0 0 / 120px 22px;
+}
+
+.band::before {
+  bottom: 100%;
+}
+
+.band::after {
+  top: 100%;
+  transform: scaleY(-1);
+}
+
+.band .section {
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.band .panel,
+.band .event-row {
+  border-color: var(--sea-line);
+}
+
+/* ---------- Cabecera de las páginas: un trozo de mar ---------- */
+
+.page-head {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff;
+  padding: 26px 28px 46px;
+  border-radius: 20px;
+  background: var(--scales) 0 0 / 34px 22px, var(--scales) 17px 11px / 34px 22px,
+    radial-gradient(600px 220px at 85% 0%, rgba(19, 143, 153, 0.5), transparent 70%),
+    linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 55%, #0d4a5a 100%);
+  box-shadow: var(--shadow);
+}
+
+.page-head::before {
+  /* El barco dragón remando por la esquina */
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -10px;
+  bottom: 6px;
+  width: min(330px, 46%);
+  aspect-ratio: 660 / 260;
+  background: url("../img/dragon-boat.svg") right bottom / contain no-repeat;
+  opacity: 0.22;
+}
+
+.page-head::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 26' preserveAspectRatio='none'%3E%3Cpath d='M0 12 q30 -12 60 0 t60 0 t60 0 t60 0 V26 H0 Z' fill='%23138f99' fill-opacity='.45'/%3E%3Cpath d='M0 18 q30 -10 60 0 t60 0 t60 0 t60 0 V26 H0 Z' fill='%230d6a73' fill-opacity='.6'/%3E%3C/svg%3E") repeat-x 0 100% / 240px 26px;
+}
+
+.page-head h1 {
+  color: #fff;
+}
+
+.page-head p,
+.page-head .muted {
+  color: #cfe0ef;
+}
+
+.page-head .btn-primary {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.page-head .search-inline input {
+  border-color: transparent;
+}
+
+@media (max-width: 640px) {
+  .page-head {
+    padding: 20px 18px 40px;
+    border-radius: 16px;
+  }
+
+  .page-head::before {
+    width: 52%;
+    opacity: 0.16;
+  }
+}
+
+/* ---------- Tarjetas con más vida ---------- */
+
+.card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card > .media {
+  border-bottom: 4px solid var(--sport, var(--red));
+}
+
+.lead-story > .media {
+  border-bottom: 0;
+  border-right: 4px solid var(--sport, var(--red));
+}
+
+.lead-story .card-body {
+  background: radial-gradient(260px 160px at 100% 100%, rgba(232, 163, 61, 0.12), transparent 70%);
+}
+
+@media (max-width: 760px) {
+  .lead-story > .media {
+    border-right: 0;
+    border-bottom: 4px solid var(--sport, var(--red));
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #d81a39, var(--red));
+  box-shadow: 0 3px 0 var(--red-dark), 0 6px 14px rgba(200, 16, 46, 0.25);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, var(--red), var(--red-dark));
+}
+
+.btn-primary:active {
+  box-shadow: 0 1px 0 var(--red-dark), 0 3px 8px rgba(200, 16, 46, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-primary {
+    background: var(--red);
+    box-shadow: none;
+  }
+}
+
+/* Deportes: baldosas con su escena */
+.sport-tile {
+  position: relative;
+  overflow: hidden;
+}
+
+.sport-tile::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  bottom: -6px;
+  width: 70px;
+  height: 22px;
+  opacity: 0.25;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 22'%3E%3Cpath d='M0 12 q8.75 -8 17.5 0 t17.5 0 t17.5 0 t17.5 0 V22 H0 Z' fill='%23138f99'/%3E%3C/svg%3E") no-repeat;
+  pointer-events: none;
+}
+
+/* ---------- Foro ---------- */
+
+.forum-row .icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #fff, var(--gold-soft));
+  box-shadow: inset 0 0 0 2px rgba(232, 163, 61, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  .forum-row .icon {
+    background: var(--surface-2);
+  }
+}
+
+/* Caja para escribir que, sin cuenta, abre la ventana de registro */
+.write-teaser {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 16px;
+  margin-bottom: 24px;
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.write-teaser:hover {
+  color: var(--muted);
+  border-color: var(--teal-2);
+  box-shadow: var(--shadow);
+}
+
+.write-teaser-icon {
+  font-size: 1.3rem;
+}
+
+.write-teaser-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- Ventana para entrar o registrarse ---------- */
+
+.join-dialog {
+  width: min(440px, calc(100% - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 24px 60px rgba(8, 20, 34, 0.45);
+}
+
+.join-dialog::backdrop {
+  background: rgba(8, 20, 34, 0.6);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+.join-dialog[open] {
+  animation: pop 0.22s ease-out;
+}
+
+.join-art {
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+}
+
+.join-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.join-body {
+  padding: 18px 22px 22px;
+  text-align: center;
+}
+
+.join-body h2 {
+  margin-bottom: 6px;
+}
+
+.join-reason {
+  font-weight: 650;
+  margin-bottom: 6px;
+}
+
+.join-note {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.join-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.join-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #fff;
+  background: rgba(8, 20, 34, 0.55);
+  cursor: pointer;
+}
+
+.join-close:hover {
+  background: rgba(8, 20, 34, 0.8);
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Pie: el barco navega sobre las olas ---------- */
+
+.site-footer {
+  position: relative;
+}
+
+.footer-boat {
+  position: absolute;
+  top: -58px;
+  right: max(16px, calc((100% - var(--wrap)) / 2 + 20px));
+  width: 190px;
+  height: auto;
+  animation: bob 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.site-footer .about h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.6em;
+  height: 1.6em;
+  margin-right: 8px;
+  vertical-align: -0.5em;
+  background: url("../img/logo.svg") center / contain no-repeat;
+}
+
+@media (max-width: 640px) {
+  .footer-boat {
+    width: 130px;
+    top: -40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-art img,
+  .sea-layer,
+  .footer-boat,
+  .join-dialog[open] {
+    animation: none;
+  }
+
+  .card:hover,
+  .card:hover .media img {
+    transform: none;
   }
 }

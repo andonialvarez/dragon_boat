@@ -17,7 +17,7 @@ class ArticleAdmin(admin.ModelAdmin):
     actions = ["publish", "unpublish"]
     fieldsets = (
         (None, {"fields": ("title", "slug", "summary", "body")}),
-        ("Imagen", {"fields": ("cover_image", "image_caption")}),
+        ("Imagen", {"fields": ("cover_image", "image_caption", "image_url")}),
         ("Clasificación", {"fields": ("sport", "category", "related_event", "related_championship")}),
         ("Publicación", {"fields": ("status", "origin", "published_at", "is_featured", "allow_comments", "is_sample")}),
         ("Fuente", {"fields": ("source_name", "source_url"), "classes": ("collapse",)}),

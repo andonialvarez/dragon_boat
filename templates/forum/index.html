@@ -5,16 +5,8 @@
 <div class="wrap page">
   <header class="page-head">
     <h1>💬 {% translate "Foro" %}</h1>
-    <p>{% translate "Pregunta, comparte y conoce a otros palistas y remeros. Leer es libre; para escribir necesitas una cuenta." %}</p>
+    <p>{% translate "Pregunta, comparte y conoce a otros palistas, remeros y aficionados." %}</p>
   </header>
-
-  {% if not user.is_authenticated %}
-    <div class="login-cta" style="margin-bottom:22px">
-      <p>{% translate "¿Quieres participar? Crea una cuenta gratis o entra con la tuya." %}</p>
-      <a class="btn btn-primary btn-small" href="{% url 'signup' %}?next={% url 'forum:index' %}">{% translate "Crear cuenta" %}</a>
-      <a class="btn btn-secondary btn-small" href="{% url 'login' %}?next={% url 'forum:index' %}">{% translate "Entrar" %}</a>
-    </div>
-  {% endif %}
 
   <div class="forum-table" role="table" aria-label="{% translate 'Categorías del foro' %}">
     <div class="forum-row head" role="row">

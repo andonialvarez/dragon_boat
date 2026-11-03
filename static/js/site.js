@@ -24,6 +24,40 @@
     });
   });
 
+  // Ventana para entrar o registrarse cuando alguien sin cuenta intenta participar
+  const joinDialog = document.getElementById("unete");
+
+  function openJoin(trigger) {
+    if (!joinDialog || typeof joinDialog.showModal !== "function") return false;
+    const reason = joinDialog.querySelector(".join-reason");
+    const key = "data-" + (trigger.dataset.login || "");
+    if (!reason.dataset.default) reason.dataset.default = reason.textContent;
+    reason.textContent = reason.getAttribute(key) || reason.dataset.default;
+
+    let next = trigger.dataset.next;
+    const href = trigger.getAttribute("href");
+    if (!next && href && href.charAt(0) === "/" && href.indexOf("?") === -1) next = href;
+    if (!next) next = window.location.pathname + window.location.search;
+    joinDialog.querySelectorAll("[data-join]").forEach(function (link) {
+      const base = link.getAttribute("href").split("?")[0];
+      link.setAttribute("href", base + "?next=" + encodeURIComponent(next));
+    });
+    joinDialog.showModal();
+    return true;
+  }
+
+  document.addEventListener("click", function (event) {
+    const trigger = event.target.closest("[data-login]");
+    if (trigger && openJoin(trigger)) event.preventDefault();
+  });
+
+  if (joinDialog) {
+    // Cerrar al pulsar fuera de la ventana
+    joinDialog.addEventListener("click", function (event) {
+      if (event.target === joinDialog) joinDialog.close();
+    });
+  }
+
   // Reacciones sin recargar la página
   document.addEventListener("submit", function (event) {
     const form = event.target.closest(".reaction-form");

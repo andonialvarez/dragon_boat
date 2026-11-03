@@ -28,7 +28,7 @@
       {% for c in championships %}
         <article class="card" style="--sport: {{ c.sport.color }}">
           {% include "includes/sample_badge.html" with obj=c corner=True %}
-          {% include "includes/media.html" with image=c.cover_image sport=c.sport alt=c.name %}
+          {% include "includes/media.html" with image=c.cover_image sport=c.sport alt=c.name seed=c.pk %}
           <div class="card-body">
             <div class="badges">
               <span class="chip">{{ c.sport.icon }} {{ c.sport.name }}</span>

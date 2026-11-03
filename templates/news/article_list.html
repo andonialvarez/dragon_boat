@@ -8,7 +8,7 @@
       <h1>{% translate "Noticias" %}{% if current_sport %} <span class="muted">· {{ current_sport.name }}</span>{% endif %}</h1>
       <p>{% translate "Actualidad del dragon boat y del resto de deportes de remo y pala: competiciones, clubes, técnica y comunidad." %}</p>
     </div>
-    <a class="btn btn-primary" href="{% url 'article_create' %}">＋ {% translate "Publicar noticia" %}</a>
+    <a class="btn btn-primary" href="{% url 'article_create' %}"{% if not user.is_authenticated %} data-login="publicar-noticia"{% endif %}>＋ {% translate "Publicar noticia" %}</a>
   </header>
 
   <nav class="filters" aria-label="{% translate 'Filtrar por deporte' %}">

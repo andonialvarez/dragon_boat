@@ -32,3 +32,8 @@ jobs:
           curl --fail-with-body --silent --show-error --max-time 180 \
             -X POST "${SITE_URL%/}/api/noticias/importar/" \
             -H "Authorization: Bearer $NEWS_API_TOKEN"
+          echo
+          # Busca la imagen de las noticias nuevas que no la traen en el feed.
+          curl --fail-with-body --silent --show-error --max-time 120 \
+            -X POST "${SITE_URL%/}/api/noticias/imagenes/" \
+            -H "Authorization: Bearer $NEWS_API_TOKEN" || echo "::warning::No se pudieron buscar imágenes esta vez."

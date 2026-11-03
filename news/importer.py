@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 
+from .images import clean_image_url
 from .models import Article
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,31 @@ def entry_datetime(entry):
         if value:
             return datetime(*value[:6], tzinfo=dt_timezone.utc)
     return None
+
+
+IMG_SRC = re.compile(r"<img[^>]+src=[\"']([^\"']+)[\"']", re.IGNORECASE)
+
+
+def entry_image(entry):
+    """Imagen que trae la propia entrada del feed (media:content, miniatura, adjunto o <img>)."""
+    candidates = []
+    for key in ("media_content", "media_thumbnail"):
+        for media in entry.get(key) or []:
+            if media.get("medium", "image") == "image" and not str(media.get("type", "image")).startswith("video"):
+                candidates.append(media.get("url"))
+    for enclosure in entry.get("enclosures") or []:
+        if str(enclosure.get("type", "")).startswith("image/"):
+            candidates.append(enclosure.get("href") or enclosure.get("url"))
+    for block in [entry.get("summary") or ""] + [c.get("value", "") for c in entry.get("content") or []]:
+        match = IMG_SRC.search(block)
+        if match:
+            candidates.append(html.unescape(match.group(1)))
+    link = entry.get("link") or ""
+    for candidate in candidates:
+        image = clean_image_url(candidate, link)
+        if image:
+            return image
+    return ""
 
 
 def fetch(url):
@@ -123,6 +149,7 @@ def import_source(source, content=None, now=None):
             published_at=published_at,
             source_name=source_name,
             source_url=link[:600],
+            image_url=entry_image(entry),
         )
         created += 1
     return created, skipped

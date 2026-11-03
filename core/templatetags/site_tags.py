@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 
 from django import template
 from django.template.defaultfilters import date as date_filter
+from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -63,3 +64,24 @@ def sport_style(sport):
     if not sport:
         return ""
     return format_html('style="--sport: {}"', sport.color)
+
+
+COVER_SPORTS = {"dragon-boat", "traineras", "piraguismo", "remo-olimpico", "vaa"}
+COVER_MOMENTS = ("manana", "atardecer", "noche")
+
+
+@register.simple_tag
+def cover_art(sport=None, seed=0):
+    """Ilustración de portada para lo que no tiene imagen: una escena del deporte.
+
+    `seed` (normalmente el id) reparte mañana, atardecer y noche para que un listado
+    no repita siempre el mismo dibujo.
+    """
+    slug = getattr(sport, "slug", "") or ""
+    if slug not in COVER_SPORTS:
+        slug = "dragon-boat"
+    try:
+        moment = COVER_MOMENTS[int(seed or 0) % len(COVER_MOMENTS)]
+    except (TypeError, ValueError):
+        moment = COVER_MOMENTS[0]
+    return static(f"img/portadas/{slug}-{moment}.svg")

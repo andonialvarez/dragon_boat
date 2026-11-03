@@ -22,7 +22,7 @@
           {% if user.is_authenticated %}
             <button type="button" class="link-button" data-reply-to="{{ comment.pk }}" aria-expanded="false" aria-controls="responder-{{ comment.pk }}">{% translate "Responder" %}</button>
           {% else %}
-            <a href="{% url 'login' %}?next={{ article.get_absolute_url|urlencode }}%23comentario-{{ comment.pk }}">{% translate "Responder" %}</a>
+            <a href="{% url 'login' %}?next={{ article.get_absolute_url|urlencode }}%23comentario-{{ comment.pk }}" data-login="responder" data-next="{{ article.get_absolute_url }}#comentario-{{ comment.pk }}">{% translate "Responder" %}</a>
           {% endif %}
         {% endif %}
         {% if user.is_authenticated and user.pk == comment.author_id %}

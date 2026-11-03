@@ -25,7 +25,7 @@
       {% if event.created_by and not event.created_by.is_staff %}<p class="small muted">{% translate "Publicado por" %} <a href="{% url 'profile_detail' event.created_by.get_username %}">{{ event.created_by.get_username }}</a></p>{% endif %}
 
       {% if event.cover_image %}
-        <figure class="article-figure">{% include "includes/media.html" with image=event.cover_image sport=event.sport alt=event.title %}</figure>
+        <figure class="article-figure">{% include "includes/media.html" with image=event.cover_image sport=event.sport alt=event.title seed=event.pk %}</figure>
       {% endif %}
 
       {% if event.description %}<div class="prose">{{ event.description|urlize|linebreaks }}</div>{% endif %}

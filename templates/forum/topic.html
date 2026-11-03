@@ -67,11 +67,8 @@
         <div class="form-actions"><button class="btn btn-primary" type="submit">{% translate "Publicar respuesta" %}</button></div>
       </form>
     {% else %}
-      <div class="login-cta">
-        <p>{% translate "Para responder necesitas una cuenta. Es gratis y tardas un minuto." %}</p>
-        <a class="btn btn-primary btn-small" href="{% url 'login' %}?next={{ topic.get_absolute_url|urlencode }}%23responder">{% translate "Entrar" %}</a>
-        <a class="btn btn-secondary btn-small" href="{% url 'signup' %}?next={{ topic.get_absolute_url|urlencode }}%23responder">{% translate "Crear cuenta" %}</a>
-      </div>
+      {% translate "Escribe tu respuesta…" as teaser %}{% translate "Responder" as button %}
+      {% include "includes/write_teaser.html" with text=teaser button=button action="responder" next=topic.get_absolute_url anchor="#responder" %}
     {% endif %}
   </section>
 </div>
