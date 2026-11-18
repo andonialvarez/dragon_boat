@@ -9,7 +9,7 @@
 {% block content %}
 <div class="wrap page">
   <div class="layout-article">
-    <article>
+    <article class="news-article{% if not article.has_picture %} sin-foto{% endif %}" data-photo-host {% if article.sport %}style="--sport: {{ article.sport.color }}"{% endif %}>
       <header class="article-header">
         <nav class="breadcrumbs"><a href="{% url 'article_list' %}">{% translate "Noticias" %}</a>{% if article.sport %} / <a href="{% url 'article_list' %}?deporte={{ article.sport.slug }}">{{ article.sport.name }}</a>{% endif %}</nav>
         <div class="badges" style="margin-bottom:10px">
@@ -38,14 +38,16 @@
       {% if article.status == "pendiente" %}
         <p class="notice warn">{% translate "Esta noticia está pendiente de revisión: solo la ves tú y el equipo de la web." %}</p>
       {% endif %}
-      <figure class="article-figure">
-        {% include "includes/media.html" with image=article.cover_image image_url=article.image_url sport=article.sport alt=article.image_caption|default:article.title seed=article.pk %}
-        {% if article.cover_image and article.image_caption %}
-          <figcaption>{{ article.image_caption }}</figcaption>
-        {% elif article.picture_is_external %}
-          <figcaption class="photo-credit">{% if article.source_name %}{% blocktranslate with source=article.source_name %}Imagen: {{ source }}{% endblocktranslate %}{% else %}{% blocktranslate with source=article.source_url|hostname %}Imagen: {{ source }}{% endblocktranslate %}{% endif %}</figcaption>
-        {% endif %}
-      </figure>
+      {% if article.has_picture %}
+        <figure class="article-figure" data-photo-figure>
+          {% include "includes/news_photo.html" with alt=article.image_caption %}
+          {% if article.cover_image and article.image_caption %}
+            <figcaption>{{ article.image_caption }}</figcaption>
+          {% elif article.picture_is_external %}
+            <figcaption class="photo-credit">{% if article.source_name %}{% blocktranslate with source=article.source_name %}Imagen: {{ source }}{% endblocktranslate %}{% else %}{% blocktranslate with source=article.source_url|hostname %}Imagen: {{ source }}{% endblocktranslate %}{% endif %}</figcaption>
+          {% endif %}
+        </figure>
+      {% endif %}
 
       {% if article.is_sample %}
         <p class="sample-note">⚠️ {% translate "Noticia de ejemplo: los equipos, personas y resultados que aparecen son ficticios." %}</p>

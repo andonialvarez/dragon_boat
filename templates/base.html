@@ -13,6 +13,15 @@
   <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
   <link rel="alternate" type="application/rss+xml" title="{{ SITE_NAME }} · {% translate 'Noticias' %}" href="{% url 'article_feed' %}">
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  <script>
+    /* Foto de noticia que no carga: se quita y la tarjeta pasa a su diseño sin foto. */
+    function dbSinFoto(img) {
+      var box = img.closest("[data-photo-box]") || img;
+      var host = box.closest("[data-photo-host]");
+      if (host) host.classList.add("sin-foto");
+      (box.closest("[data-photo-figure]") || box).remove();
+    }
+  </script>
   {% block head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">

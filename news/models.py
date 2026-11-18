@@ -68,6 +68,13 @@ class Article(SampleFlagMixin, TimeStampedMixin):
             "importadas y en los resúmenes; se muestra enlazada y con el nombre del medio."
         ),
     )
+    image_checked_at = models.DateTimeField(
+        _("foto revisada"),
+        null=True,
+        blank=True,
+        editable=False,
+        help_text=_("Cuándo se buscó o se comprobó la foto de la fuente. Vacío = se revisará en la próxima búsqueda."),
+    )
     source_name = models.CharField(_("fuente"), max_length=120, blank=True)
     source_url = models.URLField(_("enlace a la fuente"), max_length=600, blank=True, db_index=True)
     author = models.ForeignKey(
@@ -133,6 +140,10 @@ class Article(SampleFlagMixin, TimeStampedMixin):
     def picture_url(self):
         """La imagen subida o, si no hay, la del medio original."""
         return self.cover_image.url if self.cover_image else self.image_url
+
+    @property
+    def has_picture(self):
+        return bool(self.cover_image or self.image_url)
 
     @property
     def picture_is_external(self):
