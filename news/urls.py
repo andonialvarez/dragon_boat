@@ -21,5 +21,7 @@ api_urlpatterns = [
     path("noticias/", api.create_article, name="api_article_create"),
     path("noticias/importar/", api.run_import, name="api_run_import"),
     path("noticias/imagenes/", api.fill_images, name="api_fill_images"),
+    path("noticias/fotos/pendientes/", api.pending_photos, name="api_pending_photos"),
+    path("noticias/fotos/", api.save_photos, name="api_save_photos"),
     path("calendario/", events_api.update_calendar, name="api_calendar_update"),
 ]

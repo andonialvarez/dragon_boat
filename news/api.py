@@ -20,11 +20,11 @@ from django.http import Http404, JsonResponse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from core.models import Sport
 
-from .images import clean_image_url, fill_missing_images, find_image
+from .images import clean_image_url, fill_missing_images, find_image, pending_articles
 from .importer import import_from_sources
 from .models import Article, NewsSource
 
@@ -157,8 +157,53 @@ def fill_images(request):
     `?dias=N` amplía cuántos días hacia atrás se miran (por defecto 45, máximo 365).
     La respuesta dice cuántas quedan por revisar (`remaining`) para volver a llamar.
     """
+    return JsonResponse(fill_missing_images(limit=25, seconds=18, days=_days(request)))
+
+
+def _days(request):
     try:
-        days = min(max(int(request.GET.get("dias", 45)), 1), 365)
+        return min(max(int(request.GET.get("dias", 45)), 1), 365)
     except ValueError:
-        days = 45
-    return JsonResponse(fill_missing_images(limit=25, seconds=18, days=days))
+        return 45
+
+
+@require_GET
+@token_required
+def pending_photos(request):
+    """Noticias cuya foto falta por buscar o revisar (para buscarlas fuera de la web).
+
+    Desde el servidor de la web, Google Noticias a veces no responde; el flujo
+    «Buscar fotos de las noticias» de GitHub Actions las busca y las manda con
+    POST /api/noticias/fotos/.
+    """
+    articles = pending_articles(_days(request))[:100]
+    return JsonResponse(
+        {"articles": [{"id": a.pk, "source_url": a.source_url, "image_url": a.image_url} for a in articles]}
+    )
+
+
+@csrf_exempt
+@require_POST
+@token_required
+def save_photos(request):
+    """Guarda las fotos encontradas: lista de {"id", "image_url"} ("" = sin foto adecuada)."""
+    try:
+        items = json.loads(request.body.decode("utf-8"))
+        if not isinstance(items, list):
+            raise ValueError("se esperaba una lista")
+    except ValueError as error:
+        return JsonResponse({"error": str(error)}, status=400)
+    saved = errors = 0
+    for item in items[:200]:
+        if not isinstance(item, dict) or not isinstance(item.get("id"), int):
+            errors += 1
+            continue
+        raw = item.get("image_url") or ""
+        image = clean_image_url(str(raw)) if raw else ""
+        if raw and not image:
+            errors += 1
+            continue
+        saved += Article.objects.filter(
+            pk=item["id"], origin__in=[Article.Origin.IMPORTED, Article.Origin.AI], cover_image=""
+        ).update(image_url=image, image_checked_at=timezone.now())
+    return JsonResponse({"saved": saved, "errors": errors})
