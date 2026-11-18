@@ -3085,3 +3085,33 @@ body {
     padding: 24px 18px;
   }
 }
+
+/* Sin foto: la etiqueta «Ejemplo» va en su sitio y el icono del deporte, grande y suave, abajo a la derecha. */
+.news-card.sin-foto .badge-sample.corner {
+  position: static;
+  align-self: flex-start;
+  margin: 16px 18px -10px;
+  box-shadow: none;
+}
+
+.card-watermark {
+  display: none;
+}
+
+.news-card.sin-foto .card-watermark {
+  display: block;
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  font-size: 4.2rem;
+  line-height: 1;
+  opacity: 0.13;
+  filter: grayscale(0.3);
+  pointer-events: none;
+}
+
+.lead-story.sin-foto .card-watermark {
+  font-size: 7rem;
+  right: 28px;
+  bottom: 18px;
+}

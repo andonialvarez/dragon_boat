@@ -42,6 +42,7 @@
       <article class="card lead-story news-card{% if not lead.has_picture %} sin-foto{% endif %}" data-photo-host {% if lead.sport %}style="--sport: {{ lead.sport.color }}"{% endif %}>
         {% include "includes/sample_badge.html" with obj=lead corner=True %}
         {% include "includes/news_photo.html" with article=lead credit=True %}
+        {% if lead.sport %}<span class="card-watermark" aria-hidden="true">{{ lead.sport.icon }}</span>{% endif %}
         <div class="card-body">
           <div class="badges">
             {% if lead.sport %}<span class="chip" style="--sport: {{ lead.sport.color }}">{{ lead.sport.icon }} {{ lead.sport.name }}</span>{% endif %}

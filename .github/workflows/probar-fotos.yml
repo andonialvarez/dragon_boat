@@ -11,4 +11,5 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python scripts/_probar_fotos.py
+      - run: python -u scripts/_probar_fotos.py
+        timeout-minutes: 12

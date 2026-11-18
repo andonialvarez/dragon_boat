@@ -2,6 +2,7 @@
 <article class="card news-card{% if not article.has_picture %} sin-foto{% endif %}" data-photo-host {% if article.sport %}style="--sport: {{ article.sport.color }}"{% endif %}>
   {% include "includes/sample_badge.html" with obj=article corner=True %}
   {% include "includes/news_photo.html" with credit=True %}
+  {% if article.sport %}<span class="card-watermark" aria-hidden="true">{{ article.sport.icon }}</span>{% endif %}
   <div class="card-body">
     <div class="badges">
       {% if article.sport %}<span class="chip" style="--sport: {{ article.sport.color }}">{{ article.sport.icon }} {{ article.sport.name }}</span>{% endif %}
