@@ -90,6 +90,16 @@ class Event(SampleFlagMixin, TimeStampedMixin):
         blank=True,
         related_name="events_created",
     )
+    source_name = models.CharField(_("fuente"), max_length=120, blank=True, help_text=_("De dónde sale la información."))
+    source_url = models.URLField(_("enlace a la fuente"), max_length=500, blank=True)
+    external_ref = models.CharField(
+        _("referencia automática"),
+        max_length=120,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text=_("La usa la actualización automática del calendario para no duplicar eventos."),
+    )
     is_published = models.BooleanField(
         _("visible en la web"),
         default=True,

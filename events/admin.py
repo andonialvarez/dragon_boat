@@ -20,6 +20,7 @@ class EventAdmin(admin.ModelAdmin):
         ("Fecha y lugar", {"fields": (("start_date", "end_date", "start_time"), "venue", ("city", "region", "country"))}),
         ("Competición", {"fields": ("distances", "championship", "participants")}),
         ("Organización e inscripción", {"fields": ("organizer", "website", "registration_url", "registration_deadline")}),
+        ("Fuente", {"fields": ("source_name", "source_url", "external_ref")}),
         ("Publicación", {"fields": ("is_published", "created_by", "is_sample")}),
     )
 

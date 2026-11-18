@@ -24,7 +24,7 @@ class DivisionInline(admin.TabularInline):
 class StandingInline(admin.TabularInline):
     model = Standing
     extra = 3
-    fields = ("position", "team", "points", "result_time", "notes")
+    fields = ("position", "team", "competitor", "points", "result_time", "notes")
     autocomplete_fields = ("team",)
 
 
@@ -37,6 +37,7 @@ class ChampionshipAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("name", "slug", "sport", "season", "scope", "description", "cover_image")}),
         ("Organización", {"fields": ("organizer", "location", ("start_date", "end_date"))}),
+        ("Fuente", {"fields": ("source_name", "source_url", "external_ref")}),
         ("Portada", {"fields": ("is_featured", "is_sample")}),
     )
 

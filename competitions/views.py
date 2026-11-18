@@ -36,10 +36,17 @@ class ChampionshipListView(ListView):
             {
                 "current_sport": self.sport,
                 "current_season": self.season,
+                "upcoming_events": self._upcoming_events(),
                 "seasons": Championship.objects.order_by("-season").values_list("season", flat=True).distinct(),
             }
         )
         return context
+
+    def _upcoming_events(self):
+        events = Event.objects.upcoming().select_related("sport", "championship")
+        if self.sport:
+            events = events.filter(sport=self.sport)
+        return events[:6]
 
 
 class ChampionshipDetailView(DetailView):

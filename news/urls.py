@@ -1,5 +1,7 @@
 from django.urls import path
 
+from events import api as events_api
+
 from . import api, views
 from .feeds import LatestArticlesFeed
 
@@ -19,4 +21,5 @@ api_urlpatterns = [
     path("noticias/", api.create_article, name="api_article_create"),
     path("noticias/importar/", api.run_import, name="api_run_import"),
     path("noticias/imagenes/", api.fill_images, name="api_fill_images"),
+    path("calendario/", events_api.update_calendar, name="api_calendar_update"),
 ]

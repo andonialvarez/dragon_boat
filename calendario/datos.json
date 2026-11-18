@@ -1,0 +1,465 @@
+{
+  "eventos": [
+    {
+      "ref": "cto-espana-barco-dragon-200-2026",
+      "title": "X Campeonato de España de Barco Dragón 200 m",
+      "sport": "dragon-boat",
+      "kind": "campeonato",
+      "start_date": "2026-07-04",
+      "end_date": "2026-07-05",
+      "venue": "Río Miño",
+      "city": "Lugo",
+      "region": "Galicia",
+      "distances": "200 m",
+      "organizer": "Real Federación Española de Piragüismo",
+      "summary": "Campeonato de España de barco dragón en distancia de 200 m, en el río Miño a su paso por Lugo.",
+      "source_name": "El Progreso",
+      "source_url": "https://www.elprogreso.es/articulo/deporte-local-lugo/x-campeonato-barco-dragon/202607040500001983097.html",
+      "championship": "liga-nacional-barco-dragon-2026"
+    },
+    {
+      "ref": "cto-espana-barco-dragon-500-2026",
+      "title": "X Campeonato de España de Barco Dragón DB10 y DB20 500 m",
+      "sport": "dragon-boat",
+      "kind": "campeonato",
+      "start_date": "2026-08-15",
+      "end_date": "2026-08-16",
+      "venue": "Embalse de Trasona",
+      "city": "Corvera de Asturias",
+      "region": "Asturias",
+      "distances": "500 m",
+      "organizer": "Federación de Piragüismo del Principado de Asturias",
+      "summary": "Última prueba de la VII Liga Nacional de Barco Dragón, con 24 clubes en el embalse de Trasona.",
+      "source_name": "Alberche Kayak Club",
+      "source_url": "https://alberchekayak.es/el-akc-campeon-de-la-vii-liga-nacional-de-barco-dragon/",
+      "championship": "liga-nacional-barco-dragon-2026"
+    },
+    {
+      "ref": "descenso-sella-2026",
+      "title": "88.º Descenso Internacional del Sella",
+      "sport": "piraguismo",
+      "kind": "regata",
+      "start_date": "2026-08-08",
+      "venue": "Río Sella",
+      "city": "Arriondas – Ribadesella",
+      "region": "Asturias",
+      "summary": "La gran fiesta de las piraguas en el río Sella.",
+      "source_name": "El 21 Asturias",
+      "source_url": "https://el21asturias.es/walter-bouzan-y-bertin-llera-ganan-el-descenso-internacional-del-sella-2026-en-un-sprint-de-infarto/",
+      "championship": "descenso-sella-2026"
+    },
+    {
+      "ref": "bandera-concha-2026",
+      "title": "Bandera de La Concha 2026",
+      "sport": "traineras",
+      "kind": "regata",
+      "start_date": "2026-09-06",
+      "end_date": "2026-09-13",
+      "venue": "Bahía de La Concha",
+      "city": "Donostia",
+      "region": "Gipuzkoa",
+      "summary": "Dos jornadas, 6 y 13 de septiembre, en la bahía de La Concha. Gana el menor tiempo sumado.",
+      "source_name": "Descubre Donostia",
+      "source_url": "https://descubredonostia.com/en/la-concha-regatta/",
+      "championship": "bandera-concha-2026"
+    },
+    {
+      "ref": "wpfg-2027-dragon-boat",
+      "title": "Juegos Mundiales de Policías y Bomberos 2027: barco dragón",
+      "sport": "dragon-boat",
+      "kind": "campeonato",
+      "start_date": "2027-03-13",
+      "venue": "Champion Lakes Regatta Centre",
+      "city": "Perth",
+      "region": "Australia Occidental",
+      "country": "Australia",
+      "summary": "Competición de barco dragón de los World Police & Fire Games de Perth 2027, en una sola jornada.",
+      "website": "https://wpfg2027.com/es/sport/dragon-boat/",
+      "source_name": "WPFG Perth 2027",
+      "source_url": "https://wpfg2027.com/es/sport/dragon-boat/"
+    },
+    {
+      "ref": "paddle-europe-slalom-2027",
+      "title": "Campeonato de Europa de Slalom 2027",
+      "sport": "piraguismo",
+      "kind": "campeonato",
+      "start_date": "2027-05-20",
+      "end_date": "2027-05-23",
+      "city": "Cracovia",
+      "country": "Polonia",
+      "summary": "Campeonato de Europa absoluto de piragüismo slalom.",
+      "source_name": "Paddle Europe",
+      "source_url": "https://paddle-europe.eu/calendar?year=2027"
+    },
+    {
+      "ref": "wmg-2027-dragon-boat",
+      "title": "World Masters Games 2027: barco dragón",
+      "sport": "dragon-boat",
+      "kind": "campeonato",
+      "start_date": "2027-05-27",
+      "end_date": "2027-05-29",
+      "city": "Kansai",
+      "country": "Japón",
+      "summary": "Pruebas de barco dragón de los Juegos Mundiales Máster, abiertos a deportistas veteranos.",
+      "source_name": "ICF (Comité de Barco Dragón)",
+      "source_url": "https://canoeicf.com/node/98244"
+    },
+    {
+      "ref": "paddle-europe-maraton-2027",
+      "title": "Campeonato de Europa de Maratón 2027",
+      "sport": "piraguismo",
+      "kind": "campeonato",
+      "start_date": "2027-05-31",
+      "end_date": "2027-06-06",
+      "city": "Mirandela",
+      "country": "Portugal",
+      "summary": "Campeonato de Europa de piragüismo maratón, muy cerca de la frontera con España.",
+      "source_name": "Paddle Europe",
+      "source_url": "https://paddle-europe.eu/calendar?year=2027"
+    },
+    {
+      "ref": "paddle-europe-sprint-2027",
+      "title": "Campeonato de Europa de Paracanoe, Júnior, Sub-23 y Máster 2027",
+      "sport": "piraguismo",
+      "kind": "campeonato",
+      "start_date": "2027-06-10",
+      "end_date": "2027-06-13",
+      "city": "Poznan",
+      "country": "Polonia",
+      "summary": "Campeonato de Europa de aguas tranquilas (sprint) para paracanoe, júnior, sub-23 y máster.",
+      "source_name": "Paddle Europe",
+      "source_url": "https://paddle-europe.eu/calendar?year=2027"
+    },
+    {
+      "ref": "descenso-sella-2027",
+      "title": "89.º Descenso Internacional del Sella",
+      "sport": "piraguismo",
+      "kind": "regata",
+      "start_date": "2027-08-07",
+      "venue": "Río Sella",
+      "city": "Arriondas – Ribadesella",
+      "region": "Asturias",
+      "summary": "Fecha prevista según el calendario de fiestas; pendiente de confirmación oficial por la organización.",
+      "source_name": "iCalendario",
+      "source_url": "https://icalendario.net/fiestas-populares/festival-espectaculo/descenso-internacional-del-sella"
+    },
+    {
+      "ref": "icf-mundial-maraton-2027",
+      "title": "Campeonato del Mundo de Maratón ICF 2027",
+      "sport": "piraguismo",
+      "kind": "campeonato",
+      "start_date": "2027-09-01",
+      "end_date": "2027-09-05",
+      "city": "Silkeborg",
+      "country": "Dinamarca",
+      "summary": "Mundial de piragüismo maratón de la Federación Internacional de Piragüismo.",
+      "source_name": "Sportcal",
+      "source_url": "https://www.sportcal.com/press-releases/denmark-to-host-the-2027-icf-canoe-marathon-world-championships/"
+    },
+    {
+      "ref": "icf-mundial-slalom-2027",
+      "title": "Campeonato del Mundo de Slalom ICF 2027",
+      "sport": "piraguismo",
+      "kind": "campeonato",
+      "start_date": "2027-09-07",
+      "end_date": "2027-09-12",
+      "venue": "Parque Olímpico del Segre",
+      "city": "La Seu d'Urgell",
+      "region": "Lleida",
+      "summary": "Mundial de slalom y kayak cross en el canal olímpico de 1992. El freestyle y las aguas bravas se disputan en Sort. Fechas pendientes de confirmación oficial.",
+      "website": "https://canoeicf.com/node/85388",
+      "source_name": "AllSportDB",
+      "source_url": "https://allsportdb.com/Events/2027-Canoe-Slalom-World-Championships-20872"
+    },
+    {
+      "ref": "idbf-mundial-2027",
+      "title": "18.º Campeonato del Mundo de Barco Dragón IDBF",
+      "sport": "dragon-boat",
+      "kind": "campeonato",
+      "start_date": "2027-10-17",
+      "end_date": "2027-10-24",
+      "venue": "Kwun Tong Promenade",
+      "city": "Hong Kong",
+      "country": "China",
+      "summary": "Mundial de selecciones de la Federación Internacional de Barco Dragón (IDBF).",
+      "source_name": "IDBF",
+      "source_url": "https://www.dragonboat.sport/?p=69"
+    }
+  ],
+  "clasificaciones": [
+    {
+      "ref": "eusko-label-liga-2026",
+      "name": "Eusko Label Liga 2026 (Liga ACT)",
+      "sport": "traineras",
+      "season": 2026,
+      "scope": "nacional",
+      "organizer": "Asociación de Clubes de Traineras (ACT)",
+      "location": "Costa cantábrica",
+      "end_date": "2026-09-20",
+      "description": "Clasificación general de la liga de traineras masculina de máxima categoría. Orio se proclamó campeón tras la última regata, la Bandera El Corte Inglés de Portugalete (20 de septiembre de 2026).",
+      "source_name": "ACT (resultados oficiales)",
+      "source_url": "https://www.actremo.com/resultados/index.php?id=es",
+      "divisions": [
+        {
+          "name": "Clasificación general",
+          "notes": "Puntos acumulados en la temporada",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Orio Orialki",
+              "points": 217
+            },
+            {
+              "position": 2,
+              "name": "Zierbena Bahías de Bizkaia",
+              "points": 183
+            },
+            {
+              "position": 3,
+              "name": "Bermeo-Urdaibai",
+              "points": 164
+            },
+            {
+              "position": 4,
+              "name": "Getaria",
+              "points": 163
+            },
+            {
+              "position": 5,
+              "name": "Orsa Hondarribia",
+              "points": 152
+            },
+            {
+              "position": 6,
+              "name": "Naiz Homes Donostiarra",
+              "points": 147
+            },
+            {
+              "position": 7,
+              "name": "Lekittarra Elecnor",
+              "points": 104
+            },
+            {
+              "position": 8,
+              "name": "Ondarroa Kide",
+              "points": 99
+            },
+            {
+              "position": 9,
+              "name": "Itsasoko Ama - Viuda de Sainz",
+              "points": 69
+            },
+            {
+              "position": 10,
+              "name": "San Juan CMO Valves",
+              "points": 67
+            },
+            {
+              "position": 11,
+              "name": "Club de Remo de Ares",
+              "points": 63
+            },
+            {
+              "position": 12,
+              "name": "Club de Remo Chapela - Wofco",
+              "points": 53
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "liga-euskotren-2026",
+      "name": "Liga Euskotren 2026",
+      "sport": "traineras",
+      "season": 2026,
+      "scope": "nacional",
+      "organizer": "Asociación de Clubes de Traineras (ACT)",
+      "location": "Costa cantábrica",
+      "description": "Liga femenina de traineras de máxima categoría. Donostia Arraun Lagunak se proclamó campeona de la temporada 2026. Hondarribia y Zarautz lograron el ascenso para 2027 en el play-off.",
+      "source_name": "ACT",
+      "source_url": "https://www.actremo.com/noticias/index.php?v=0&c=4&desde=0&id=es",
+      "divisions": [
+        {
+          "name": "Campeona",
+          "notes": "La fuente solo publica la campeona",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Donostia Arraun Lagunak"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "bandera-concha-2026",
+      "name": "Bandera de La Concha 2026",
+      "sport": "traineras",
+      "season": 2026,
+      "scope": "nacional",
+      "organizer": "Ayuntamiento de Donostia (Donostia Kultura)",
+      "location": "Bahía de La Concha, Donostia",
+      "start_date": "2026-09-06",
+      "end_date": "2026-09-13",
+      "description": "La regata más famosa del remo de banco fijo se disputa en dos jornadas y gana quien suma el menor tiempo total. En 2026 ganaron Orio Orialki (masculina) y Arraun Lagunak (femenina).",
+      "source_name": "Descubre Donostia (actas de Donostia Kultura)",
+      "source_url": "https://descubredonostia.com/en/la-concha-regatta/",
+      "divisions": [
+        {
+          "name": "Bandera masculina",
+          "notes": "Tiempo total de las dos jornadas",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Orio Orialki",
+              "time": "39:27,56"
+            },
+            {
+              "position": 2,
+              "name": "Donostiarra",
+              "time": "39:44,52"
+            },
+            {
+              "position": 3,
+              "name": "Zierbena",
+              "time": "39:58,66"
+            }
+          ]
+        },
+        {
+          "name": "Bandera femenina",
+          "notes": "Tiempo total de las dos jornadas",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Arraun Lagunak",
+              "time": "21:21,00"
+            },
+            {
+              "position": 2,
+              "name": "San Juan",
+              "time": "21:42,04"
+            },
+            {
+              "position": 3,
+              "name": "Tolosaldea",
+              "time": "21:45,54"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "liga-nacional-barco-dragon-2026",
+      "name": "VII Liga Nacional de Barco Dragón 2026",
+      "sport": "dragon-boat",
+      "season": 2026,
+      "scope": "nacional",
+      "organizer": "Real Federación Española de Piragüismo",
+      "end_date": "2026-08-16",
+      "description": "Liga nacional por clubes que suma los puntos de los campeonatos de España de barco dragón. Se cerró con el X Campeonato de España DB10 y DB20 de 500 m en el embalse de Trasona (Asturias), los días 15 y 16 de agosto. Participaron 47 clubes y puntuaron 30.",
+      "source_name": "Alberche Kayak Club",
+      "source_url": "https://alberchekayak.es/el-akc-campeon-de-la-vii-liga-nacional-de-barco-dragon/",
+      "divisions": [
+        {
+          "name": "Clasificación final por clubes",
+          "notes": "La fuente publica los tres primeros",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Alberche Kayak Club",
+              "points": 396
+            },
+            {
+              "position": 2,
+              "name": "Club CMDC Breogán do Grove",
+              "points": 381
+            },
+            {
+              "position": 3,
+              "name": "Club Escuela Piragüismo Aranjuez",
+              "points": 379
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "descenso-sella-2026",
+      "name": "88.º Descenso Internacional del Sella",
+      "sport": "piraguismo",
+      "season": 2026,
+      "scope": "internacional",
+      "location": "Arriondas – Ribadesella (Asturias)",
+      "start_date": "2026-08-08",
+      "end_date": "2026-08-08",
+      "description": "La gran fiesta de las piraguas en el río Sella. Walter Bouzán y Bertín Llera ganaron en K2 en un sprint muy ajustado.",
+      "source_name": "El 21 Asturias",
+      "source_url": "https://el21asturias.es/walter-bouzan-y-bertin-llera-ganan-el-descenso-internacional-del-sella-2026-en-un-sprint-de-infarto/",
+      "divisions": [
+        {
+          "name": "K2 hombres",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Walter Bouzán / Bertín Llera"
+            },
+            {
+              "position": 2,
+              "name": "Miguel Llorens / Valdemar Jørgensen"
+            },
+            {
+              "position": 3,
+              "name": "Adrián Boros / Tamás Erdélyi"
+            }
+          ]
+        },
+        {
+          "name": "K2 mujeres",
+          "notes": "La fuente solo publica la tripulación ganadora",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Amaia Osaba / Llara Tuset"
+            }
+          ]
+        },
+        {
+          "name": "K1 hombres",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Alberto Plaza"
+            },
+            {
+              "position": 2,
+              "name": "Joaquín Iglesias"
+            },
+            {
+              "position": 3,
+              "name": "Kiko Vega"
+            }
+          ]
+        },
+        {
+          "name": "K1 mujeres",
+          "standings": [
+            {
+              "position": 1,
+              "name": "Zsófia Czelai-Vörös"
+            },
+            {
+              "position": 2,
+              "name": "Irati Osa"
+            },
+            {
+              "position": 3,
+              "name": "Andrea Rodríguez"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

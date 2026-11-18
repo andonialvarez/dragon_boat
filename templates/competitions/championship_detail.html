@@ -46,6 +46,7 @@
           {% if championship.start_date %}<dt>{% translate "Fechas" %}</dt><dd>{% date_range championship.start_date championship.end_date %}</dd>{% endif %}
           {% if championship.location %}<dt>{% translate "Sedes" %}</dt><dd>{{ championship.location }}</dd>{% endif %}
           {% if championship.organizer %}<dt>{% translate "Organiza" %}</dt><dd>{{ championship.organizer }}</dd>{% endif %}
+          {% if championship.source_url %}<dt>{% translate "Fuente" %}</dt><dd><a href="{{ championship.source_url }}" target="_blank" rel="noopener">{% if championship.source_name %}{{ championship.source_name }}{% else %}{{ championship.source_url|hostname }}{% endif %}</a></dd>{% endif %}
         </dl>
       </section>
       {% if events %}

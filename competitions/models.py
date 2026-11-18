@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -91,6 +92,16 @@ class Championship(SampleFlagMixin, TimeStampedMixin):
         upload_to="campeonatos/",
         blank=True,
         validators=[validate_image_extension, validate_image_size],
+    )
+    source_name = models.CharField(_("fuente"), max_length=120, blank=True, help_text=_("De dónde salen los resultados."))
+    source_url = models.URLField(_("enlace a la fuente"), max_length=500, blank=True)
+    external_ref = models.CharField(
+        _("referencia automática"),
+        max_length=120,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text=_("La usa la actualización automática de resultados para no duplicar campeonatos."),
     )
     is_featured = models.BooleanField(
         _("destacado en portada"),
@@ -186,7 +197,15 @@ class Standing(models.Model):
     division = models.ForeignKey(
         Division, verbose_name=_("categoría"), on_delete=models.CASCADE, related_name="standings"
     )
-    team = models.ForeignKey(Team, verbose_name=_("equipo"), on_delete=models.CASCADE, related_name="standings")
+    team = models.ForeignKey(
+        Team, verbose_name=_("equipo"), on_delete=models.CASCADE, related_name="standings", null=True, blank=True
+    )
+    competitor = models.CharField(
+        _("participante"),
+        max_length=150,
+        blank=True,
+        help_text=_("Club, tripulación o palista cuando no tiene ficha de equipo en la web."),
+    )
     position = models.PositiveSmallIntegerField(_("puesto"))
     points = models.DecimalField(_("puntos"), max_digits=7, decimal_places=2, null=True, blank=True)
     result_time = models.CharField(_("tiempo"), max_length=20, blank=True, help_text=_("Por ejemplo 0:52,31"))
@@ -201,4 +220,12 @@ class Standing(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.position}. {self.team}"
+        return f"{self.position}. {self.display_name}"
+
+    def clean(self):
+        if not self.team_id and not self.competitor.strip():
+            raise ValidationError(_("Elige un equipo o escribe el nombre del participante."))
+
+    @property
+    def display_name(self):
+        return self.team.name if self.team_id else self.competitor
