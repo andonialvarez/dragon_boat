@@ -144,3 +144,118 @@ class EventPublishingTests(TestCase):
         self.assertEqual(event.title, "Evento corregido")
         self.client.post(reverse("event_delete", args=[event.slug]))
         self.assertFalse(Event.objects.exists())
+
+
+@override_settings(NEWS_API_TOKEN="token-de-prueba")
+class CalendarApiTests(TestCase):
+    url = "/api/calendario/"
+
+    def post(self, payload, token="token-de-prueba"):
+        import json
+
+        return self.client.post(
+            self.url,
+            data=json.dumps(payload),
+            content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+
+    def payload(self):
+        future = timezone.localdate() + timedelta(days=40)
+        return {
+            "clasificaciones": [
+                {
+                    "ref": "concha-prueba",
+                    "name": "Bandera de prueba",
+                    "sport": "traineras",
+                    "season": 2026,
+                    "source_name": "Fuente",
+                    "source_url": "https://example.com/resultados",
+                    "divisions": [
+                        {
+                            "name": "Masculina",
+                            "standings": [
+                                {"position": 1, "name": "Club Uno", "time": "20:01,10"},
+                                {"position": 2, "name": "Club Dos", "time": "20:05,00"},
+                            ],
+                        }
+                    ],
+                }
+            ],
+            "eventos": [
+                {
+                    "ref": "regata-prueba",
+                    "title": "Regata de prueba",
+                    "sport": "dragon-boat",
+                    "start_date": future.isoformat(),
+                    "city": "Sevilla",
+                    "source_name": "Fuente",
+                    "source_url": "https://example.com/evento",
+                    "championship": "concha-prueba",
+                }
+            ],
+        }
+
+    def test_requires_token(self):
+        self.assertEqual(self.post(self.payload(), token="otro").status_code, 401)
+
+    def test_creates_then_updates_without_duplicates(self):
+        response = self.post(self.payload())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["eventos"]["creados"], ["Regata de prueba"])
+        event = Event.objects.get(external_ref="regata-prueba")
+        self.assertEqual(event.championship.name, "Bandera de prueba")
+        self.assertEqual(event.source_url, "https://example.com/evento")
+
+        payload = self.payload()
+        payload["eventos"][0]["status"] = "aplazado"
+        payload["clasificaciones"][0]["divisions"][0]["standings"].pop()
+        response = self.post(payload)
+        self.assertEqual(response.json()["eventos"]["actualizados"], ["Regata de prueba"])
+        self.assertEqual(Event.objects.filter(external_ref="regata-prueba").count(), 1)
+        self.assertEqual(Event.objects.get(external_ref="regata-prueba").status, "aplazado")
+        from competitions.models import Standing
+
+        self.assertEqual(Standing.objects.filter(division__championship__external_ref="concha-prueba").count(), 1)
+
+    def test_links_existing_team(self):
+        from competitions.models import Standing, Team
+
+        team = Team.objects.create(name="Club Uno")
+        self.post(self.payload())
+        row = Standing.objects.get(position=1)
+        self.assertEqual(row.team, team)
+        self.assertEqual(row.display_name, "Club Uno")
+        self.assertEqual(Standing.objects.get(position=2).competitor, "Club Dos")
+
+    def test_rejects_items_without_source_and_saves_nothing(self):
+        payload = self.payload()
+        del payload["eventos"][0]["source_url"]
+        response = self.post(payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("fuente", response.json()["error"])
+        self.assertFalse(Event.objects.exists())
+        from competitions.models import Championship
+
+        self.assertFalse(Championship.objects.exists())
+
+    def test_pages_show_results_and_calendar(self):
+        self.post(self.payload())
+        page = self.client.get(reverse("championship_list") + "?deporte=dragon-boat")
+        self.assertContains(page, "Próximas pruebas de")
+        self.assertContains(page, "Regata de prueba")
+        detail = self.client.get(reverse("championship_detail", args=["bandera-de-prueba"]))
+        self.assertContains(detail, "Club Dos")
+        self.assertContains(detail, "https://example.com/resultados")
+        event_page = self.client.get(reverse("event_detail", args=["regata-de-prueba"]))
+        self.assertContains(event_page, "https://example.com/evento")
+
+    def test_repository_file_is_valid(self):
+        import json
+        from pathlib import Path
+
+        from django.conf import settings
+
+        data = json.loads((Path(settings.BASE_DIR) / "calendario" / "datos.json").read_text(encoding="utf-8"))
+        response = self.post(data)
+        self.assertEqual(response.status_code, 200, response.content)

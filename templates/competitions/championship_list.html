@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Campeonatos y clasificaciones" %}{% endblock %}
+{% block title %}{% translate "Calendario y clasificaciones" %}{% endblock %}
 {% block content %}
 <div class="wrap page">
   <header class="page-head">
-    <h1>{% translate "Campeonatos y clasificaciones" %}</h1>
-    <p>{% translate "Ligas, campeonatos y regatas con sus clasificaciones por categoría y los equipos que participan." %}</p>
+    <h1>{% translate "Calendario y clasificaciones" %}</h1>
+    <p>{% translate "Calendario de las próximas pruebas y resultados de ligas, campeonatos y regatas de cada deporte, siempre con su fuente." %}</p>
   </header>
 
   <nav class="filters" aria-label="{% translate 'Filtrar por deporte' %}">
@@ -23,6 +23,19 @@
     </nav>
   {% endif %}
 
+  <section class="section" style="padding-top:0" aria-labelledby="t-calendario">
+    <div class="section-head">
+      <h2 id="t-calendario">📅 {% if current_sport %}{% blocktranslate with sport=current_sport.name %}Próximas pruebas de {{ sport }}{% endblocktranslate %}{% else %}{% translate "Próximas pruebas" %}{% endif %}</h2>
+      <a href="{% url 'event_list' %}{% if current_sport %}?deporte={{ current_sport.slug }}{% endif %}">{% translate "Calendario completo" %} →</a>
+    </div>
+    {% if upcoming_events %}
+      <ul class="event-list">{% for event in upcoming_events %}{% include "includes/event_row.html" %}{% endfor %}</ul>
+    {% else %}
+      <p class="muted">{% translate "Todavía no hay fechas publicadas para las próximas pruebas. El calendario se revisa cada semana." %}</p>
+    {% endif %}
+  </section>
+
+  <div class="section-head"><h2>🏆 {% translate "Resultados y clasificaciones" %}</h2></div>
   {% if championships %}
     <div class="grid grid-3">
       {% for c in championships %}
@@ -40,7 +53,7 @@
             <div class="meta">
               <span>🗓 {{ c.season }}</span>
               {% if c.location %}<span>📍 {{ c.location }}</span>{% endif %}
-              <span>👥 {% blocktranslate count counter=c.team_count %}{{ counter }} equipo{% plural %}{{ counter }} equipos{% endblocktranslate %}</span>
+              {% if c.team_count %}<span>👥 {% blocktranslate count counter=c.team_count %}{{ counter }} equipo{% plural %}{{ counter }} equipos{% endblocktranslate %}</span>{% endif %}
             </div>
           </div>
         </article>

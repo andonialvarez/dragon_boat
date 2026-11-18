@@ -63,6 +63,7 @@
         <ul class="plain-list small" style="margin-top:14px">
           {% if event.map_url %}<li><a href="{{ event.map_url }}" target="_blank" rel="noopener">🗺️ {% translate "Ver en el mapa" %}</a></li>{% endif %}
           {% if event.website %}<li><a href="{{ event.website }}" target="_blank" rel="noopener">🔗 {{ event.website|hostname }}</a></li>{% endif %}
+          {% if event.source_url %}<li>📰 {% translate "Fuente:" %} <a href="{{ event.source_url }}" target="_blank" rel="noopener">{% if event.source_name %}{{ event.source_name }}{% else %}{{ event.source_url|hostname }}{% endif %}</a></li>{% endif %}
         </ul>
       </section>
 

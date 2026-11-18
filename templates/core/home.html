@@ -101,7 +101,7 @@
               {% for row in featured_division.standings.all|slice:":5" %}
                 <tr>
                   <td><span class="pos pos-{{ row.position }}">{{ row.position }}</span></td>
-                  <td class="team-name"><a href="{{ row.team.get_absolute_url }}">{{ row.team.display_short_name }}</a><span class="origin">{{ row.team.city }}</span></td>
+                  <td class="team-name">{% if row.team %}<a href="{{ row.team.get_absolute_url }}">{{ row.team.display_short_name }}</a><span class="origin">{{ row.team.city }}</span>{% else %}{{ row.competitor }}{% endif %}</td>
                   <td class="num">{% if row.points is not None %}{{ row.points|floatformat:"-2" }}{% else %}{{ row.result_time|default:"—" }}{% endif %}</td>
                 </tr>
               {% endfor %}
