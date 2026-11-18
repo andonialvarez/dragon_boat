@@ -1,4 +1,4 @@
-"""Genera las ilustraciones de portada de las noticias sin imagen.
+"""Genera las ilustraciones de portada de los eventos y campeonatos sin imagen.
 
 Una escena por deporte y momento del día (mañana, atardecer y noche), en
 static/img/portadas/<deporte>-<momento>.svg. Se ejecuta a mano si se cambian:

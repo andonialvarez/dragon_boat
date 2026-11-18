@@ -15,7 +15,20 @@ from core.models import Sport
 from events.models import Event
 from scripts import publicar_noticias
 
-from .images import extract_image, fill_missing_images, find_image
+import base64
+import struct
+
+from . import images
+from .images import (
+    _decode_old_google_id,
+    clean_image_url,
+    extract_image,
+    fill_missing_images,
+    find_image,
+    image_size,
+    is_suitable_image,
+    looks_generic,
+)
 from .importer import entry_image, import_source
 from .models import Article, Comment, NewsSource
 
@@ -452,9 +465,8 @@ class SourceImageTests(TestCase):
         )
         self.assertEqual(extract_image("<p>sin imagen</p>", "https://m.example.com/"), "")
 
-    def test_find_image_skips_google_news_and_private_hosts(self):
+    def test_find_image_skips_private_hosts(self):
         with mock.patch("news.images.urllib.request.urlopen") as urlopen:
-            self.assertEqual(find_image("https://news.google.com/rss/articles/abc"), "")
             self.assertEqual(find_image("http://127.0.0.1:8000/admin/"), "")
             self.assertEqual(find_image("ftp://example.com/a"), "")
             urlopen.assert_not_called()
@@ -490,15 +502,126 @@ class SourceImageTests(TestCase):
             status=Article.Status.PUBLISHED,
             source_url="https://medio.example.com/2",
         )
-        with mock.patch("news.images.find_image", return_value="https://medio.example.com/foto.jpg") as finder:
+        photos = {"https://medio.example.com/1": "https://medio.example.com/foto.jpg"}
+        with mock.patch("news.images.find_image", side_effect=lambda url: photos.get(url, "")) as finder:
             result = fill_missing_images()
-        finder.assert_called_once_with("https://medio.example.com/1")
-        self.assertEqual(result, {"checked": 1, "updated": 1})
+        self.assertEqual(finder.call_count, 2)  # Las de Google Noticias también se buscan.
+        self.assertEqual(result, {"checked": 2, "updated": 1, "removed": 0, "remaining": 0})
         imported.refresh_from_db()
         google.refresh_from_db()
         community.refresh_from_db()
         self.assertEqual(imported.image_url, "https://medio.example.com/foto.jpg")
         self.assertEqual((google.image_url, community.image_url), ("", ""))
+        self.assertIsNotNone(google.image_checked_at)  # No se vuelve a buscar cada vez.
+        with mock.patch("news.images.find_image") as finder:
+            self.assertEqual(fill_missing_images()["checked"], 0)
+        finder.assert_not_called()
+
+    @override_settings(NEWS_FETCH_IMAGES=True)
+    def test_fill_missing_images_removes_generic_pictures(self):
+        logo = Article.objects.create(
+            title="Con logotipo",
+            summary="Resumen.",
+            origin=Article.Origin.AI,
+            status=Article.Status.PUBLISHED,
+            source_url="https://medio.example.com/3",
+            image_url="https://medio.example.com/static/logo-medio.png",
+        )
+        result = fill_missing_images()
+        self.assertEqual(result["removed"], 1)
+        logo.refresh_from_db()
+        self.assertEqual(logo.image_url, "")
+
+
+def _png(width, height):
+    return b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR" + struct.pack(">II", width, height) + b"\x08\x02\x00\x00\x00"
+
+
+def _jpeg(width, height):
+    return (
+        b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00"
+        + b"\xff\xc0\x00\x11\x08"
+        + struct.pack(">HH", height, width)
+        + b"\x03\x01\x22\x00\x02\x11\x01\x03\x11\x01"
+    )
+
+
+class PhotoQualityTests(TestCase):
+    def test_image_size(self):
+        self.assertEqual(image_size(_png(1200, 630)), (1200, 630))
+        self.assertEqual(image_size(_jpeg(1024, 576)), (1024, 576))
+        self.assertEqual(image_size(b"GIF89a" + struct.pack("<HH", 64, 32)), (64, 32))
+        self.assertIsNone(image_size(b"no es una imagen"))
+
+    def test_generic_addresses(self):
+        self.assertTrue(looks_generic("https://m.example.com/img/logo.png"))
+        self.assertTrue(looks_generic("https://m.example.com/assets/og-default.jpg"))
+        self.assertTrue(looks_generic("https://m.example.com/favicon-192.png"))
+        self.assertFalse(looks_generic("https://m.example.com/fotos/2026/regata-bilbao.jpg"))
+        self.assertFalse(looks_generic("https://m.example.com/fotos/dragon-boat-logrono.jpg"))
+
+    def test_clean_image_url_encodes_spaces(self):
+        self.assertEqual(
+            clean_image_url("https://img.example.com/is/image/foto regata.jpg"),
+            "https://img.example.com/is/image/foto%20regata.jpg",
+        )
+        self.assertEqual(clean_image_url("https://img.example.com/a%20b.jpg"), "https://img.example.com/a%20b.jpg")
+
+    def test_suitable_image_checks_size_and_home_page(self):
+        def opener(url, **kwargs):
+            sizes = {
+                "https://m.example.com/grande.jpg": ("image/jpeg", _jpeg(1200, 675)),
+                "https://m.example.com/pequena.png": ("image/png", _png(120, 120)),
+                "https://m.example.com/tira.png": ("image/png", _png(1600, 200)),
+                "https://m.example.com/portada.jpg": ("image/jpeg", _jpeg(1200, 630)),
+            }
+            content_type, data = sizes[url]
+            return content_type, "utf-8", data, url
+
+        images._home_images.clear()
+        home = ('<meta property="og:image" content="https://m.example.com/portada.jpg">', "https://m.example.com/")
+        with mock.patch("news.images._open", side_effect=opener), mock.patch("news.images._read_page", return_value=home):
+            self.assertTrue(is_suitable_image("https://m.example.com/grande.jpg", "https://m.example.com/n/1"))
+            self.assertFalse(is_suitable_image("https://m.example.com/pequena.png", "https://m.example.com/n/1"))
+            self.assertFalse(is_suitable_image("https://m.example.com/tira.png", "https://m.example.com/n/1"))
+            self.assertFalse(is_suitable_image("https://m.example.com/portada.jpg", "https://m.example.com/n/1"))
+        images._home_images.clear()
+
+    def test_unreachable_image_is_accepted(self):
+        with mock.patch("news.images._open", return_value=None), mock.patch("news.images._read_page", return_value=None):
+            images._home_images.clear()
+            self.assertTrue(is_suitable_image("https://m.example.com/foto.jpg", "https://m.example.com/n/1"))
+        images._home_images.clear()
+
+    def test_old_google_news_links_are_decoded_offline(self):
+        payload = b"\x08\x13\x22\x2ahttps://medio.example.com/noticia-de-regata\xd2\x01\x00"
+        article_id = base64.urlsafe_b64encode(payload).decode().rstrip("=")
+        self.assertEqual(_decode_old_google_id(article_id), "https://medio.example.com/noticia-de-regata")
+        self.assertEqual(_decode_old_google_id("AU_yqLxxxx"), "")
+
+    def test_find_image_follows_google_news_to_the_outlet(self):
+        page = ('<meta property="og:image" content="https://medio.example.com/foto.jpg">', "https://medio.example.com/n")
+        with (
+            mock.patch("news.images.resolve_google_news", return_value="https://medio.example.com/n") as resolver,
+            mock.patch("news.images._read_page", return_value=page) as reader,
+            mock.patch("news.images.is_suitable_image", return_value=True),
+            mock.patch("news.images.GOOGLE_PAUSE_SECONDS", 0),
+        ):
+            self.assertEqual(find_image("https://news.google.com/rss/articles/CBMiabc?oc=5"), "https://medio.example.com/foto.jpg")
+        resolver.assert_called_once()
+        reader.assert_called_once_with("https://medio.example.com/n")
+
+    @override_settings(NEWS_FETCH_IMAGES=True)
+    def test_google_news_without_answer_is_retried_later(self):
+        article = Article.objects.create(
+            title="De Google", summary="R.", origin=Article.Origin.IMPORTED, status=Article.Status.PUBLISHED,
+            source_url="https://news.google.com/rss/articles/CBMiabc",
+        )
+        with mock.patch("news.images.resolve_google_news", return_value=""), mock.patch("news.images.GOOGLE_PAUSE_SECONDS", 0):
+            result = fill_missing_images()
+        self.assertEqual((result["checked"], result["remaining"]), (1, 1))
+        article.refresh_from_db()
+        self.assertIsNone(article.image_checked_at)
 
 
 @override_settings(NEWS_API_TOKEN="token-de-prueba")
@@ -542,25 +665,42 @@ class ApiImageTests(TestCase):
 
     def test_fill_images_endpoint_requires_token(self):
         self.assertEqual(self.client.post("/api/noticias/imagenes/").status_code, 401)
-        response = self.client.post("/api/noticias/imagenes/", HTTP_AUTHORIZATION="Bearer token-de-prueba")
-        self.assertEqual(response.json(), {"checked": 0, "updated": 0})
+        response = self.client.post("/api/noticias/imagenes/?dias=200", HTTP_AUTHORIZATION="Bearer token-de-prueba")
+        self.assertEqual(response.json(), {"checked": 0, "updated": 0, "removed": 0, "remaining": 0})
 
 
-class CoverArtTests(TestCase):
-    def test_every_article_has_a_picture(self):
+class NoPhotoLayoutTests(TestCase):
+    def test_article_without_photo_uses_text_layout(self):
         sport = Sport.objects.get(slug="traineras")
         article = Article.objects.create(
             title="Sin foto", summary="Resumen.", sport=sport, status=Article.Status.PUBLISHED
         )
         list_page = self.client.get(reverse("article_list"))
-        self.assertContains(list_page, "img/portadas/traineras-")
-        self.assertContains(self.client.get(article.get_absolute_url()), "img/portadas/traineras-")
+        self.assertContains(list_page, "news-card sin-foto")
+        self.assertNotContains(list_page, "media-art")  # Ni ilustraciones de relleno.
+        detail = self.client.get(article.get_absolute_url())
+        self.assertContains(detail, "news-article sin-foto")
+        self.assertNotContains(detail, "article-figure")
 
-    def test_cover_art_files_exist(self):
-        from django.contrib.staticfiles import finders
+    def test_article_with_photo_shows_it(self):
+        article = Article.objects.create(
+            title="Con foto",
+            summary="Resumen.",
+            status=Article.Status.PUBLISHED,
+            source_name="Medio",
+            image_url="https://medio.example.com/foto.jpg",
+        )
+        list_page = self.client.get(reverse("article_list"))
+        self.assertNotContains(list_page, "news-card sin-foto")
+        self.assertContains(list_page, 'src="https://medio.example.com/foto.jpg"')
+        self.assertContains(list_page, "📷 Medio")
+        self.assertContains(self.client.get(article.get_absolute_url()), "article-figure")
 
-        from core.templatetags.site_tags import COVER_MOMENTS, COVER_SPORTS
-
-        for sport in COVER_SPORTS:
-            for moment in COVER_MOMENTS:
-                self.assertTrue(finders.find(f"img/portadas/{sport}-{moment}.svg"), f"{sport}-{moment}")
+    def test_home_leads_with_a_photo(self):
+        Article.objects.create(title="Con foto", summary="R.", status=Article.Status.PUBLISHED,
+                               image_url="https://medio.example.com/foto.jpg",
+                               published_at=timezone.now() - timedelta(days=1))
+        Article.objects.create(title="Sin foto reciente", summary="R.", status=Article.Status.PUBLISHED)
+        response = self.client.get(reverse("home"))
+        self.assertEqual(response.context["lead"].title, "Con foto")
+        self.assertEqual([a.title for a in response.context["latest"]], ["Sin foto reciente"])

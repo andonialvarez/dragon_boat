@@ -6,8 +6,8 @@ from news.images import fill_missing_images
 
 class Command(BaseCommand):
     help = (
-        "Busca la imagen que usa cada medio para compartir sus noticias (og:image) en las noticias "
-        "importadas o resumidas que aún no tienen."
+        "Busca la foto de las noticias importadas o resumidas que aún no la tienen (también detrás de "
+        "Google Noticias) y quita las que resultan ser logotipos o imágenes genéricas."
     )
 
     def add_arguments(self, parser):
@@ -21,5 +21,8 @@ class Command(BaseCommand):
             return
         result = fill_missing_images(limit=options["limite"], seconds=options["segundos"], days=options["dias"])
         self.stdout.write(
-            self.style.SUCCESS(f"Imágenes encontradas: {result['updated']} de {result['checked']} noticias revisadas.")
+            self.style.SUCCESS(
+                f"Fotos encontradas: {result['updated']}; quitadas por no ser adecuadas: {result['removed']}; "
+                f"noticias revisadas: {result['checked']}; quedan por revisar: {result['remaining']}."
+            )
         )

@@ -1,7 +1,8 @@
 {% load i18n %}
-<article class="card">
+<article class="card news-card{% if not article.has_picture %} sin-foto{% endif %}" data-photo-host {% if article.sport %}style="--sport: {{ article.sport.color }}"{% endif %}>
   {% include "includes/sample_badge.html" with obj=article corner=True %}
-  {% include "includes/media.html" with image=article.cover_image image_url=article.image_url credit=article.source_name sport=article.sport alt=article.title seed=article.pk %}
+  {% include "includes/news_photo.html" with credit=True %}
+  {% if article.sport %}<span class="card-watermark" aria-hidden="true">{{ article.sport.icon }}</span>{% endif %}
   <div class="card-body">
     <div class="badges">
       {% if article.sport %}<span class="chip" style="--sport: {{ article.sport.color }}">{{ article.sport.icon }} {{ article.sport.name }}</span>{% endif %}
@@ -9,9 +10,12 @@
       {% if article.origin != "redaccion" %}<span class="badge origin-badge {{ article.origin }}">{% if article.origin == "importada" %}{% blocktranslate with source=article.source_name %}Vía {{ source }}{% endblocktranslate %}{% else %}{{ article.get_origin_display }}{% endif %}</span>{% endif %}
     </div>
     <h3 class="card-title"><a class="card-link" href="{{ article.get_absolute_url }}">{{ article.title }}</a></h3>
-    <p>{{ article.summary|truncatewords:30 }}</p>
+    <p class="card-summary">{{ article.summary|truncatewords:30 }}</p>
+    {# Sin foto, la tarjeta enseña más texto para no quedar vacía. #}
+    <p class="card-summary-long">{{ article.summary|truncatewords:55 }}</p>
     <div class="meta">
       <time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j M Y"|lower }}</time>
+      {% if article.source_name and article.origin != "importada" %}<span class="card-source">{{ article.source_name }}</span>{% endif %}
       {% if article.comment_count %}<span>💬 {{ article.comment_count }}</span>{% endif %}
     </div>
   </div>

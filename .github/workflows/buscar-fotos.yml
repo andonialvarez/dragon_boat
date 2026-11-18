@@ -1,0 +1,36 @@
+name: Buscar fotos de las noticias
+
+# Busca la foto de las noticias de otras webs que aún no la tienen y revisa las que
+# ya tienen (quita logotipos e imágenes genéricas). Se lanza a mano desde la pestaña
+# Actions («Run workflow»); el importador de los lunes ya lo hace con las nuevas.
+# Necesita el secreto NEWS_API_TOKEN, como los demás flujos de noticias.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dias:
+        description: "Cuántos días hacia atrás mirar (máximo 365)"
+        default: "365"
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Buscar fotos
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://dragonboat-ih42.onrender.com' }}
+          NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
+          DIAS: ${{ inputs.dias || '365' }}
+        run: |
+          if [ -z "$NEWS_API_TOKEN" ]; then
+            echo "::error::Falta el secreto NEWS_API_TOKEN en GitHub (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          curl --silent --output /dev/null --retry 5 --retry-delay 15 --retry-all-errors --max-time 120 "${SITE_URL%/}/robots.txt" || true
+          for tanda in $(seq 1 30); do
+            respuesta=$(curl --fail-with-body --silent --show-error --max-time 120 \
+              -X POST "${SITE_URL%/}/api/noticias/imagenes/?dias=${DIAS}" \
+              -H "Authorization: Bearer $NEWS_API_TOKEN")
+            echo "Tanda $tanda: $respuesta"
+            echo "$respuesta" | grep -q '"remaining": 0' && break
+          done

@@ -97,7 +97,7 @@ def create_article(request):
             if not image_url:
                 raise ValidationError("«image_url» debe ser un enlace http:// o https://")
         elif source_url and settings.NEWS_FETCH_IMAGES:
-            image_url = find_image(source_url)
+            image_url = find_image(source_url) or ""
 
         published_at = timezone.now()
         if payload.get("published_at"):
@@ -119,6 +119,7 @@ def create_article(request):
             source_name=(payload.get("source_name") or "")[:120],
             source_url=source_url,
             image_url=image_url,
+            image_checked_at=timezone.now() if image_url else None,
         )
         article.full_clean(exclude=["slug"])
         article.save()
@@ -151,5 +152,13 @@ def run_import(request):
 @require_POST
 @token_required
 def fill_images(request):
-    """Busca la imagen de las noticias recientes que aún no tienen (con límite de tiempo)."""
-    return JsonResponse(fill_missing_images(limit=25, seconds=18))
+    """Busca la foto de las noticias recientes y revisa las que ya tienen (con límite de tiempo).
+
+    `?dias=N` amplía cuántos días hacia atrás se miran (por defecto 45, máximo 365).
+    La respuesta dice cuántas quedan por revisar (`remaining`) para volver a llamar.
+    """
+    try:
+        days = min(max(int(request.GET.get("dias", 45)), 1), 365)
+    except ValueError:
+        days = 45
+    return JsonResponse(fill_missing_images(limit=25, seconds=18, days=days))

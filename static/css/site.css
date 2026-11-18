@@ -2981,3 +2981,137 @@ body {
     transform: none;
   }
 }
+
+/* ---------- Noticias sin foto ----------
+   Si no hay una foto adecuada de la noticia, la tarjeta no deja un hueco: lleva
+   el color del deporte, una comilla grande de fondo, el titular más grande y más
+   texto de la entradilla. */
+
+.card-summary-long {
+  display: none;
+}
+
+.news-card.sin-foto .card-summary {
+  display: none;
+}
+
+.news-card.sin-foto .card-summary-long {
+  display: block;
+}
+
+.news-card.sin-foto {
+  border-top: 6px solid var(--sport, var(--red));
+  background:
+    radial-gradient(320px 180px at 100% 0%, color-mix(in srgb, var(--sport, var(--teal)) 13%, transparent), transparent 70%),
+    var(--surface);
+}
+
+.news-card.sin-foto::before {
+  content: "“";
+  position: absolute;
+  top: -0.18em;
+  right: 12px;
+  font-family: var(--font-serif);
+  font-size: 7.5rem;
+  line-height: 1;
+  color: var(--sport, var(--red));
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.news-card.sin-foto .card-body {
+  padding-top: 22px;
+  gap: 10px;
+}
+
+.news-card.sin-foto .card-title {
+  font-family: var(--font-serif);
+  font-size: 1.32rem;
+  line-height: 1.25;
+}
+
+.news-card.sin-foto .card-summary-long {
+  border-left: 3px solid color-mix(in srgb, var(--sport, var(--red)) 55%, transparent);
+  padding-left: 12px;
+}
+
+.card-source {
+  color: var(--muted);
+}
+
+.lead-story.sin-foto {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lead-story.sin-foto .card-body {
+  padding: 34px clamp(20px, 4vw, 48px);
+}
+
+.lead-story.sin-foto .card-title {
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+  max-width: 30ch;
+}
+
+.lead-story.sin-foto p {
+  font-size: 1.12rem;
+  max-width: 62ch;
+}
+
+.lead-story.sin-foto::before {
+  font-size: 11rem;
+}
+
+/* Página de la noticia sin foto: el titular lleva el color del deporte y una línea de puntos. */
+.news-article.sin-foto .article-header {
+  border-left: 5px solid var(--sport, var(--red));
+  padding-left: 18px;
+}
+
+.news-article.sin-foto .article-header::after {
+  content: "";
+  display: block;
+  height: 7px;
+  margin: 22px 0 26px;
+  background: radial-gradient(circle, var(--sport, var(--gold)) 1.6px, transparent 2.2px) 0 50% / 16px 7px repeat-x;
+  opacity: 0.7;
+}
+
+@media (max-width: 640px) {
+  .news-article.sin-foto .article-header {
+    padding-left: 12px;
+  }
+
+  .lead-story.sin-foto .card-body {
+    padding: 24px 18px;
+  }
+}
+
+/* Sin foto: la etiqueta «Ejemplo» va en su sitio y el icono del deporte, grande y suave, abajo a la derecha. */
+.news-card.sin-foto .badge-sample.corner {
+  position: static;
+  align-self: flex-start;
+  margin: 16px 18px -10px;
+  box-shadow: none;
+}
+
+.card-watermark {
+  display: none;
+}
+
+.news-card.sin-foto .card-watermark {
+  display: block;
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  font-size: 4.2rem;
+  line-height: 1;
+  opacity: 0.13;
+  filter: grayscale(0.3);
+  pointer-events: none;
+}
+
+.lead-story.sin-foto .card-watermark {
+  font-size: 7rem;
+  right: 28px;
+  bottom: 18px;
+}

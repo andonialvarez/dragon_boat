@@ -20,9 +20,11 @@ def home(request):
         .annotate(comment_count=Count("comments", filter=Q(comments__is_hidden=False, comments__is_deleted=False)))
         .order_by("-is_featured", "-published_at")[:7]
     )
-    # La destacada va arriba; el resto, por fecha.
-    lead = articles[0] if articles else None
-    latest = sorted(articles[1:], key=lambda a: a.published_at, reverse=True)
+    # Arriba va la destacada; si no hay, la más reciente que tenga foto. El resto, por fecha.
+    lead = None
+    if articles:
+        lead = articles[0] if articles[0].is_featured else next((a for a in articles if a.has_picture), articles[0])
+    latest = sorted((a for a in articles if a is not lead), key=lambda a: a.published_at, reverse=True)
 
     standings = Standing.objects.select_related("team").order_by("position")
     featured_championship = (

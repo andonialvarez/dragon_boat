@@ -39,9 +39,10 @@
       <a href="{% url 'article_list' %}">{% translate "Todas las noticias" %} →</a>
     </div>
     {% if lead %}
-      <article class="card lead-story">
+      <article class="card lead-story news-card{% if not lead.has_picture %} sin-foto{% endif %}" data-photo-host {% if lead.sport %}style="--sport: {{ lead.sport.color }}"{% endif %}>
         {% include "includes/sample_badge.html" with obj=lead corner=True %}
-        {% include "includes/media.html" with image=lead.cover_image image_url=lead.image_url credit=lead.source_name sport=lead.sport alt=lead.title seed=lead.pk %}
+        {% include "includes/news_photo.html" with article=lead credit=True %}
+        {% if lead.sport %}<span class="card-watermark" aria-hidden="true">{{ lead.sport.icon }}</span>{% endif %}
         <div class="card-body">
           <div class="badges">
             {% if lead.sport %}<span class="chip" style="--sport: {{ lead.sport.color }}">{{ lead.sport.icon }} {{ lead.sport.name }}</span>{% endif %}
@@ -51,6 +52,7 @@
           <p>{{ lead.summary }}</p>
           <div class="meta">
             <time datetime="{{ lead.published_at|date:'c' }}">{{ lead.published_at|date:"j \d\e F \d\e Y" }}</time>
+            {% if lead.source_name %}<span class="card-source">{% blocktranslate with source=lead.source_name %}Vía {{ source }}{% endblocktranslate %}</span>{% endif %}
             {% if lead.comment_count %}<span>💬 {{ lead.comment_count }} {% translate "comentarios" %}</span>{% endif %}
           </div>
         </div>

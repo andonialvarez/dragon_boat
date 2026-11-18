@@ -1,0 +1,13 @@
+{# Foto de una noticia: la subida o la del medio original. Si no hay, no se pinta nada y la tarjeta usa su diseño sin foto. #}
+{# Si la foto del medio no carga o es demasiado pequeña, se quita y la tarjeta pasa al diseño sin foto. #}
+{% if article.cover_image %}
+  <div class="media news-photo" data-photo-box {% if article.sport %}style="--sport: {{ article.sport.color }}"{% endif %}>
+    <img class="media-photo" src="{{ article.cover_image.url }}" alt="{{ alt|default:article.title }}" loading="lazy">
+  </div>
+{% elif article.image_url %}
+  <div class="media news-photo" data-photo-box {% if article.sport %}style="--sport: {{ article.sport.color }}"{% endif %}>
+    <img class="media-photo" src="{{ article.image_url }}" alt="{{ alt|default:article.title }}" loading="lazy" referrerpolicy="no-referrer"
+         onerror="dbSinFoto(this)" onload="if (this.naturalWidth && this.naturalWidth < 320) dbSinFoto(this)">
+    {% if credit and article.source_name %}<span class="media-credit">📷 {{ article.source_name }}</span>{% endif %}
+  </div>
+{% endif %}
