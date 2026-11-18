@@ -704,3 +704,34 @@ class NoPhotoLayoutTests(TestCase):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.context["lead"].title, "Con foto")
         self.assertEqual([a.title for a in response.context["latest"]], ["Sin foto reciente"])
+
+
+@override_settings(NEWS_API_TOKEN="token-de-prueba")
+class PhotoApiTests(TestCase):
+    def test_pending_and_save_photos(self):
+        google = Article.objects.create(
+            title="De Google", summary="R.", origin=Article.Origin.IMPORTED, status=Article.Status.PUBLISHED,
+            source_url="https://news.google.com/rss/articles/CBMiabc",
+        )
+        community = Article.objects.create(
+            title="De la comunidad", summary="R.", origin=Article.Origin.COMMUNITY, status=Article.Status.PUBLISHED,
+            source_url="https://medio.example.com/c",
+        )
+        auth = {"HTTP_AUTHORIZATION": "Bearer token-de-prueba"}
+        self.assertEqual(self.client.get("/api/noticias/fotos/pendientes/").status_code, 401)
+        pending = self.client.get("/api/noticias/fotos/pendientes/?dias=365", **auth).json()["articles"]
+        self.assertEqual([a["id"] for a in pending], [google.pk])
+
+        items = [
+            {"id": google.pk, "image_url": "https://medio.example.com/foto regata.jpg"},
+            {"id": community.pk, "image_url": "https://medio.example.com/otra.jpg"},  # No es de otra web: no se toca.
+            {"id": google.pk, "image_url": "javascript:alert(1)"},
+        ]
+        response = self.client.post("/api/noticias/fotos/", json.dumps(items), content_type="application/json", **auth)
+        self.assertEqual(response.json(), {"saved": 1, "errors": 1})
+        google.refresh_from_db()
+        community.refresh_from_db()
+        self.assertEqual(google.image_url, "https://medio.example.com/foto%20regata.jpg")
+        self.assertIsNotNone(google.image_checked_at)
+        self.assertEqual(community.image_url, "")
+        self.assertEqual(self.client.get("/api/noticias/fotos/pendientes/", **auth).json()["articles"], [])

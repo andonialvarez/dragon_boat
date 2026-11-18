@@ -1,8 +1,10 @@
 name: Buscar fotos de las noticias
 
 # Busca la foto de las noticias de otras webs que aún no la tienen y revisa las que
-# ya tienen (quita logotipos e imágenes genéricas). Se lanza a mano desde la pestaña
-# Actions («Run workflow»); el importador de los lunes ya lo hace con las nuevas.
+# ya tienen (quita logotipos e imágenes genéricas). Primero lo hace la propia web;
+# lo que la web no puede mirar (por ejemplo, Google Noticias no le responde) se
+# busca desde aquí y se le manda. Se lanza a mano desde la pestaña Actions
+# («Run workflow»); el importador de los lunes ya lo hace con las noticias nuevas.
 # Necesita el secreto NEWS_API_TOKEN, como los demás flujos de noticias.
 
 on:
@@ -15,22 +17,31 @@ on:
 jobs:
   buscar:
     runs-on: ubuntu-latest
+    env:
+      SITE_URL: ${{ vars.SITE_URL || 'https://dragonboat-ih42.onrender.com' }}
+      NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
+      DIAS: ${{ inputs.dias || '365' }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
       - name: Buscar fotos
-        env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://dragonboat-ih42.onrender.com' }}
-          NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
-          DIAS: ${{ inputs.dias || '365' }}
         run: |
           if [ -z "$NEWS_API_TOKEN" ]; then
             echo "::error::Falta el secreto NEWS_API_TOKEN en GitHub (Settings > Secrets and variables > Actions)."
             exit 1
           fi
           curl --silent --output /dev/null --retry 5 --retry-delay 15 --retry-all-errors --max-time 120 "${SITE_URL%/}/robots.txt" || true
-          for tanda in $(seq 1 30); do
+          # La web busca las que puede (unos segundos por tanda).
+          for tanda in 1 2 3 4 5; do
             respuesta=$(curl --fail-with-body --silent --show-error --max-time 120 \
               -X POST "${SITE_URL%/}/api/noticias/imagenes/?dias=${DIAS}" \
-              -H "Authorization: Bearer $NEWS_API_TOKEN")
-            echo "Tanda $tanda: $respuesta"
-            echo "$respuesta" | grep -q '"remaining": 0' && break
+              -H "Authorization: Bearer $NEWS_API_TOKEN") || break
+            echo "Web, tanda $tanda: $respuesta"
+            if echo "$respuesta" | grep -q '"updated": 0, "removed": 0'; then break; fi
           done
+          # El resto, desde aquí.
+          python scripts/buscar_fotos.py "$DIAS"
