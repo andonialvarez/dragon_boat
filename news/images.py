@@ -163,6 +163,7 @@ def _read_page(url, headers=None):
 
 # ---------- Google Noticias ----------
 
+GOOGLE_PAUSE_SECONDS = 1.5
 GOOGLE_COOKIES = {"Cookie": "CONSENT=YES+cb; SOCS=CAI"}  # Evita la página de consentimiento.
 
 
@@ -321,14 +322,17 @@ def is_suitable_image(image_url, page_url=""):
 def find_image(page_url, timeout=TIMEOUT_SECONDS):
     """Busca la foto de una noticia y la devuelve si es adecuada (o "").
 
-    Los enlaces de Google Noticias se traducen primero al enlace del medio.
+    Los enlaces de Google Noticias se traducen primero al enlace del medio. Si
+    Google no responde (por ejemplo, por demasiadas peticiones seguidas), devuelve
+    None para que la noticia se vuelva a intentar en la próxima búsqueda.
     """
     if not is_http_url(page_url):
         return ""
     if (urlsplit(page_url).hostname or "").lower() == GOOGLE_NEWS_HOST:
         page_url = resolve_google_news(page_url)
+        time.sleep(GOOGLE_PAUSE_SECONDS)  # Google corta si se le piden muchas seguidas.
         if not page_url:
-            return ""
+            return None
     page = _read_page(page_url)
     if not page:
         return ""
@@ -386,6 +390,8 @@ def fill_missing_images(limit=30, seconds=20, days=45):
                 removed += 1
         else:
             image = image_for_article(article)
+            if image is None:
+                continue  # Sin respuesta de Google Noticias: se reintenta la próxima vez.
             if image:
                 changes["image_url"] = image
                 updated += 1

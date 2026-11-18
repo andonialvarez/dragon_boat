@@ -97,7 +97,7 @@ def create_article(request):
             if not image_url:
                 raise ValidationError("«image_url» debe ser un enlace http:// o https://")
         elif source_url and settings.NEWS_FETCH_IMAGES:
-            image_url = find_image(source_url)
+            image_url = find_image(source_url) or ""
 
         published_at = timezone.now()
         if payload.get("published_at"):

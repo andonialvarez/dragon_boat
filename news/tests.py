@@ -546,7 +546,7 @@ def _jpeg(width, height):
     )
 
 
-class PhotoQualityTests(SimpleTestCase):
+class PhotoQualityTests(TestCase):
     def test_image_size(self):
         self.assertEqual(image_size(_png(1200, 630)), (1200, 630))
         self.assertEqual(image_size(_jpeg(1024, 576)), (1024, 576))
@@ -605,10 +605,23 @@ class PhotoQualityTests(SimpleTestCase):
             mock.patch("news.images.resolve_google_news", return_value="https://medio.example.com/n") as resolver,
             mock.patch("news.images._read_page", return_value=page) as reader,
             mock.patch("news.images.is_suitable_image", return_value=True),
+            mock.patch("news.images.GOOGLE_PAUSE_SECONDS", 0),
         ):
             self.assertEqual(find_image("https://news.google.com/rss/articles/CBMiabc?oc=5"), "https://medio.example.com/foto.jpg")
         resolver.assert_called_once()
         reader.assert_called_once_with("https://medio.example.com/n")
+
+    @override_settings(NEWS_FETCH_IMAGES=True)
+    def test_google_news_without_answer_is_retried_later(self):
+        article = Article.objects.create(
+            title="De Google", summary="R.", origin=Article.Origin.IMPORTED, status=Article.Status.PUBLISHED,
+            source_url="https://news.google.com/rss/articles/CBMiabc",
+        )
+        with mock.patch("news.images.resolve_google_news", return_value=""), mock.patch("news.images.GOOGLE_PAUSE_SECONDS", 0):
+            result = fill_missing_images()
+        self.assertEqual((result["checked"], result["remaining"]), (1, 1))
+        article.refresh_from_db()
+        self.assertIsNone(article.image_checked_at)
 
 
 @override_settings(NEWS_API_TOKEN="token-de-prueba")
