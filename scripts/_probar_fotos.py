@@ -7,6 +7,8 @@ import urllib.request
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 os.environ.setdefault("DEBUG", "true")
+import logging
+logging.basicConfig(level=logging.INFO)
 import django
 
 django.setup()
@@ -21,11 +23,11 @@ FEEDS = [
 ]
 for feed in FEEDS:
     raw = urllib.request.urlopen(urllib.request.Request(feed, headers={"User-Agent": images.USER_AGENT}), timeout=20).read()
-    for entry in feedparser.parse(raw).entries[:6]:
+    for entry in feedparser.parse(raw).entries[:8]:
         real = images.resolve_google_news(entry.link)
         photo = images.find_image(entry.link)
         print(f"GN | {entry.title[:70]}\n   -> {real or 'SIN RESOLVER'}\n   foto: {photo or 'NINGUNA'}")
-for url in json.load(open(os.path.join(os.path.dirname(__file__), "_probe_urls.json"))):
+for url in [] or json.load(open(os.path.join(os.path.dirname(__file__), "_probe_urls.json"))):
     page = images._read_page(url)
     raw_img = images.extract_image(*page) if page else ""
     photo = images.find_image(url)

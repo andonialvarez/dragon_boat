@@ -145,7 +145,11 @@ def _open(url, *, headers=None, data=None, max_bytes=MAX_BYTES, timeout=TIMEOUT_
 
 
 def _read_page(url, headers=None):
-    result = _open(url, headers={"Accept": "text/html,application/xhtml+xml", **(headers or {})})
+    headers = {"Accept": "text/html,application/xhtml+xml", "Accept-Language": "es-ES,es;q=0.9", **(headers or {})}
+    result = _open(url, headers=headers)
+    if not result:
+        # Algunos medios solo responden a navegadores: segundo intento como navegador.
+        result = _open(url, headers={**headers, "User-Agent": BROWSER_AGENT})
     if not result:
         return None
     content_type, charset, raw, final_url = result
