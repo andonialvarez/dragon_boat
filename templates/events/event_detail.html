@@ -11,7 +11,7 @@
         {% include "includes/sample_badge.html" with obj=event %}
         <span class="chip" style="--sport: {{ event.sport.color }}">{{ event.sport.icon }} {{ event.sport.name }}</span>
         <span class="badge">{{ event.get_kind_display }}</span>
-        {% if event.status != "programado" %}<span class="badge badge-red">{{ event.get_status_display }}</span>{% elif event.is_past %}<span class="badge badge-muted">{% translate "Celebrado" %}</span>{% endif %}
+        {% if event.status == "provisional" %}<span class="badge badge-provisional" title="{% translate 'Sacadas de un calendario provisional: pueden cambiar.' %}">{{ event.get_status_display }}</span>{% elif event.status != "programado" %}<span class="badge badge-red">{{ event.get_status_display }}</span>{% elif event.is_past %}<span class="badge badge-muted">{% translate "Celebrado" %}</span>{% endif %}
       </div>
       <h1>{{ event.title }}</h1>
       {% if event.summary %}<p class="summary" style="font-size:1.15rem; color: var(--ink-soft)">{{ event.summary }}</p>{% endif %}

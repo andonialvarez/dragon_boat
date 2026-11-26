@@ -94,6 +94,9 @@ def _fold(line):
     return "\r\n ".join(parts)
 
 
+ICS_STATUS = {Event.Status.PROVISIONAL: "TENTATIVE", Event.Status.CANCELLED: "CANCELLED"}
+
+
 def event_ics(request, slug):
     """Descarga el evento en formato calendario (Google Calendar, Outlook, iPhone...)."""
     event = get_object_or_404(Event.objects.visible(), slug=slug)
@@ -126,6 +129,7 @@ def event_ics(request, slug):
         f"DTSTAMP:{stamp}",
         *date_lines,
         f"SUMMARY:{_ics_escape(event.title)}",
+        f"STATUS:{ICS_STATUS.get(event.status, 'CONFIRMED')}",
         f"LOCATION:{_ics_escape(event.place or event.city)}",
         f"DESCRIPTION:{_ics_escape(description + chr(10) + chr(10) + url)}",
         f"URL:{url}",

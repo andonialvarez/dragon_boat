@@ -6,6 +6,10 @@ Cada lunes, una tarea programada busca en internet **eventos con fecha confirmad
 «Publicar calendario» los envía a la web (`POST /api/calendario/`). Si el fichero cambia
 en `main`, también se publica.
 
+Además de `datos.json`, en `calendario/` puede haber otros ficheros con el mismo formato, por ejemplo
+`borrador-rfep-2027.json` (borrador del calendario estatal 2027 de la RFEP, con `status: provisional`).
+Cuando uno de ellos cambia en `main`, se publica solo ese fichero.
+
 - Los eventos aparecen en **Eventos** y, por deporte, en **Clasificaciones › Próximas pruebas**.
 - Los resultados aparecen en **Clasificaciones**, con su fuente enlazada.
 - Nunca se inventa nada: cada evento y cada clasificación lleva `source_url`.
@@ -73,7 +77,7 @@ con la misma `ref`, se actualiza (por ejemplo, para cambiar fechas, marcarlo com
 
 - `sport`: `dragon-boat`, `traineras`, `piraguismo`, `remo-olimpico` o `vaa`.
 - `kind`: `regata`, `campeonato`, `liga`, `festival`, `travesia`, `formacion` u `otro`.
-- `status`: `programado`, `aplazado` o `cancelado`.
+- `status`: `programado`, `provisional` (fechas sacadas de un borrador, la web las marca como «Fechas provisionales»), `aplazado` o `cancelado`.
 - `scope`: `local`, `autonomico`, `nacional` o `internacional`.
 - Fechas en formato `AAAA-MM-DD`. `country` es «España» si no se pone.
 - Al enviar una clasificación con `divisions`, sus categorías se **sustituyen** enteras.

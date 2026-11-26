@@ -40,6 +40,7 @@ class Event(SampleFlagMixin, TimeStampedMixin):
 
     class Status(models.TextChoices):
         SCHEDULED = "programado", _("Programado")
+        PROVISIONAL = "provisional", _("Fechas provisionales")
         POSTPONED = "aplazado", _("Aplazado")
         CANCELLED = "cancelado", _("Cancelado")
 

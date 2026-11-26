@@ -3115,3 +3115,10 @@ body {
   right: 28px;
   bottom: 18px;
 }
+
+/* Eventos con fechas de un calendario provisional (borrador). */
+.badge-provisional {
+  background: var(--gold);
+  border: 1px dashed #2b1a00;
+  color: #2b1a00;
+}
