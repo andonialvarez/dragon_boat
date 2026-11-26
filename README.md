@@ -206,7 +206,7 @@ El repositorio está listo para **[Render](https://render.com)** con el fichero 
 
 1. Crea una cuenta en Render entrando con tu GitHub.
 2. Crea la base de datos en **[Neon](https://neon.tech)** (plan gratuito, PostgreSQL 17 o más nuevo, en la misma región que la web de Render) y copia su dirección (`postgresql://...`).
-3. **New › Blueprint** › elige el repositorio `dragon_boat`. Render lee `render.yaml`, crea la web y genera `SECRET_KEY` y `NEWS_API_TOKEN`.
+3. **New › Blueprint** › elige el repositorio `dragon_boat`. Render lee `render.yaml`, crea la web en Frankfurt y genera `SECRET_KEY` y `NEWS_API_TOKEN`.
 4. Antes de confirmar, Render pide tres valores: `DATABASE_URL` (la dirección de Neon), `DJANGO_SUPERUSER_PASSWORD` (la contraseña que quieras para entrar en `/admin/` con el usuario `andoni`) y `DJANGO_SUPERUSER_EMAIL` (tu email). El administrador se crea solo en el primer despliegue; el plan gratuito no tiene consola, así que no hace falta usarla.
 5. Para usar tu propio dominio, añádelo en Render (*Settings › Custom Domains*) y en las variables `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS`.
 

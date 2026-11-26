@@ -165,3 +165,14 @@ class HealthCheckTests(TestCase):
 
     def test_only_reads(self):
         self.assertEqual(self.client.post("/salud/").status_code, 405)
+
+
+class RedirectToNewAddressTests(TestCase):
+    def test_no_redirect_by_default(self):
+        self.assertEqual(self.client.get("/salud/").status_code, 200)
+
+    def test_old_address_sends_visitors_to_the_new_one(self):
+        with self.settings(REDIRECT_TO="https://nueva.onrender.com"):
+            response = self.client.get("/noticias/?pagina=2")
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "https://nueva.onrender.com/noticias/?pagina=2")
