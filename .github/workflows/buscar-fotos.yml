@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Buscar fotos
         env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://dragonboat-ih42.onrender.com' }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://dragon-boat-s7go.onrender.com' }}
           NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
           DIAS: ${{ inputs.dias || '365' }}
         run: |

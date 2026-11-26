@@ -5,7 +5,7 @@ name: Importar noticias
 # Para cambiar el día u hora, edita la línea `cron` (minuto hora * * día; 1 = lunes, 2 = martes).
 # Para activarlo, añade en GitHub (Settings > Secrets and variables > Actions) el
 # secreto NEWS_API_TOKEN, con el mismo valor que la variable NEWS_API_TOKEN de Render.
-# La dirección de la web es https://dragonboat-ih42.onrender.com; si cambia, crea
+# La dirección de la web es https://dragon-boat-s7go.onrender.com; si cambia, crea
 # la variable SITE_URL (pestaña «Variables») con la nueva.
 # Sin el secreto, el trabajo falla y GitHub avisa por correo.
 
@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Lanzar el importador
         env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://dragonboat-ih42.onrender.com' }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://dragon-boat-s7go.onrender.com' }}
           NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
         run: |
           if [ -z "$NEWS_API_TOKEN" ]; then

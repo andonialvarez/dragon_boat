@@ -56,6 +56,11 @@ if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 
+# Si la web se muda de dirección, en la copia antigua se pone REDIRIGIR_A con la nueva
+# (https://...) y todas las visitas se envían allí.
+REDIRECT_TO = os.environ.get("REDIRIGIR_A", "").strip().rstrip("/")
+
+
 # --- Aplicaciones -----------------------------------------------------------
 
 INSTALLED_APPS = [
@@ -79,6 +84,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "core.middleware.RedirectToNewAddressMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

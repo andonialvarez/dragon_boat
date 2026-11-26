@@ -206,14 +206,14 @@ El repositorio está listo para **[Render](https://render.com)** con el fichero 
 
 1. Crea una cuenta en Render entrando con tu GitHub.
 2. Crea la base de datos en **[Neon](https://neon.tech)** (plan gratuito, PostgreSQL 17 o más nuevo, en la misma región que la web de Render) y copia su dirección (`postgresql://...`).
-3. **New › Blueprint** › elige el repositorio `dragon_boat`. Render lee `render.yaml`, crea la web y genera `SECRET_KEY` y `NEWS_API_TOKEN`.
+3. **New › Blueprint** › elige el repositorio `dragon_boat`. Render lee `render.yaml`, crea la web en Frankfurt y genera `SECRET_KEY` y `NEWS_API_TOKEN`.
 4. Antes de confirmar, Render pide tres valores: `DATABASE_URL` (la dirección de Neon), `DJANGO_SUPERUSER_PASSWORD` (la contraseña que quieras para entrar en `/admin/` con el usuario `andoni`) y `DJANGO_SUPERUSER_EMAIL` (tu email). El administrador se crea solo en el primer despliegue; el plan gratuito no tiene consola, así que no hace falta usarla.
 5. Para usar tu propio dominio, añádelo en Render (*Settings › Custom Domains*) y en las variables `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS`.
 
 **Ten en cuenta:**
 
 - El plan gratuito de Render «duerme» la web tras 15 minutos sin visitas. Para evitarlo, un monitor gratuito de **[UptimeRobot](https://uptimerobot.com)** visita `/salud/` cada 5 minutos; esa ruta no toca la base de datos, así que Neon sí puede dormirse cuando no hay nadie y no gasta sus horas gratuitas.
-- La base de datos gratuita de Render caduca a los 30 días; por eso los datos están en Neon. Para pasar los datos de una base de datos a otra está el flujo `.github/workflows/copiar-base-datos.yml`, que compara después las filas de cada tabla.
+- La base de datos gratuita de Render caduca a los 30 días; por eso los datos están en Neon. Para pasar los datos de una base de datos a otra (otra región u otro proveedor) está el flujo `.github/workflows/copiar-base-datos.yml`, con los secretos `BD_ORIGEN` y `BD_DESTINO`; después compara las filas de cada tabla. Pon la base de datos en la misma región que la web (la de Render, por defecto Oregón): si están lejos, cada consulta cruza el océano y la web va lenta.
 - **Imágenes subidas** (fotos de noticias, eventos y foro): el disco de los servicios web se borra en cada despliegue. Para conservarlas, elige una de estas opciones:
   - Un **disco persistente** en Render (planes de pago): móntalo en `/var/data` y define `MEDIA_ROOT=/var/data/media` y `SERVE_MEDIA=true`.
   - Un almacenamiento compatible con S3 (Cloudflare R2, Backblaze B2, AWS S3): añade `django-storages[s3]` a `requirements.txt` y define las variables `AWS_*` de `.env.example`.
