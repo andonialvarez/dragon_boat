@@ -2,7 +2,8 @@ from django.db.models import Count, Prefetch, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.decorators.http import require_GET
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET, require_safe
 
 from competitions.models import Championship, Division, Standing, Team
 from events.models import Event
@@ -120,6 +121,13 @@ def rules(request):
 
 def privacy(request):
     return render(request, "core/privacy.html")
+
+
+@never_cache
+@require_safe
+def salud(request):
+    """Respuesta mínima para UptimeRobot: mantiene despierta la web sin tocar la base de datos."""
+    return HttpResponse("ok\n", content_type="text/plain")
 
 
 @require_GET

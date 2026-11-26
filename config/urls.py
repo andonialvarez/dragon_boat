@@ -35,6 +35,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("robots.txt", core_views.robots_txt, name="robots_txt"),
+    path("salud/", core_views.salud, name="salud"),
 ]
 
 handler403 = "core.views.error_403"

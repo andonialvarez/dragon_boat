@@ -1,12 +1,7 @@
 # Plano de despliegue para Render (https://render.com).
-# En Render: New > Blueprint > elige este repositorio. Crea la web y la base de datos.
-# Al crearlo, Render pide la contraseña del administrador (DJANGO_SUPERUSER_PASSWORD).
-databases:
-  - name: dragonboat-db
-    databaseName: dragonboat
-    user: dragonboat
-    plan: free
-
+# En Render: New > Blueprint > elige este repositorio. Crea la web.
+# La base de datos está en Neon (plan gratuito): pega su dirección en DATABASE_URL.
+# Al crearlo, Render pide DATABASE_URL y la contraseña del administrador (DJANGO_SUPERUSER_PASSWORD).
 services:
   - type: web
     name: dragonboat
@@ -17,10 +12,9 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
+      # Dirección de la base de datos de Neon (postgresql://...); se pone a mano en Render.
       - key: DATABASE_URL
-        fromDatabase:
-          name: dragonboat-db
-          property: connectionString
+        sync: false
       - key: SECRET_KEY
         generateValue: true
       - key: NEWS_API_TOKEN

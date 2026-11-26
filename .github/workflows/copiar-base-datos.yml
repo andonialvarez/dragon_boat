@@ -1,0 +1,93 @@
+name: Copiar base de datos a Neon
+
+# Copia todos los datos de la base de datos de Render a la de Neon y comprueba
+# que cada tabla tiene las mismas filas. Solo hace falta una vez (cambio a Neon).
+#
+# Necesita dos secretos en GitHub (Settings > Secrets and variables > Actions):
+#   RENDER_DATABASE_URL  «External Database URL» de dragonboat-db en Render
+#   NEON_DATABASE_URL    dirección de Neon (postgresql://...), sin «pooled connection»
+#
+# Si Neon ya tiene datos, no hace nada salvo que se lance a mano con «sobrescribir = si».
+# El repositorio es público: no se guarda ninguna copia ni se muestra ningún dato,
+# solo el número de filas de cada tabla.
+
+on:
+  push:
+    branches: [copiar-base-datos]
+  workflow_dispatch:
+    inputs:
+      sobrescribir:
+        description: "Borrar lo que haya en Neon y copiarlo de nuevo (si / no)"
+        default: "no"
+
+jobs:
+  copiar:
+    runs-on: ubuntu-latest
+    env:
+      ORIGEN: ${{ secrets.RENDER_DATABASE_URL }}
+      DESTINO: ${{ secrets.NEON_DATABASE_URL }}
+      SOBRESCRIBIR: ${{ inputs.sobrescribir || 'no' }}
+    steps:
+      - name: Comprobar los secretos
+        run: |
+          for nombre in ORIGEN DESTINO; do
+            if [ -z "${!nombre}" ]; then
+              echo "::error::Faltan los secretos RENDER_DATABASE_URL y NEON_DATABASE_URL en GitHub."
+              exit 1
+            fi
+          done
+
+      - name: Instalar las herramientas de PostgreSQL
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-18 > /dev/null
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+
+      - name: Comprobar las dos bases de datos
+        run: |
+          origen=$(psql "$ORIGEN" -At -c "show server_version_num")
+          destino=$(psql "$DESTINO" -At -c "show server_version_num")
+          echo "PostgreSQL en Render: $((origen / 10000)) · en Neon: $((destino / 10000))"
+          if [ $((destino / 10000)) -lt $((origen / 10000)) ]; then
+            echo "::error::Neon tiene una versión de PostgreSQL más antigua que Render. Crea el proyecto de Neon con la versión $((origen / 10000)) o más nueva."
+            exit 1
+          fi
+          tablas=$(psql "$DESTINO" -At -c "select count(*) from information_schema.tables where table_schema = 'public'")
+          if [ "$tablas" != "0" ] && [ "$SOBRESCRIBIR" != "si" ]; then
+            echo "::error::Neon ya tiene $tablas tablas. Para no pisar datos, no se copia nada. Si de verdad quieres sustituirlos, lánzalo a mano con «sobrescribir = si»."
+            exit 1
+          fi
+
+      - name: Copiar los datos
+        run: |
+          copia="$RUNNER_TEMP/copia.dump"
+          pg_dump "$ORIGEN" --format=custom --no-owner --no-privileges --schema=public --file="$copia"
+          opciones="--no-owner --no-privileges --exit-on-error --single-transaction"
+          if [ "$SOBRESCRIBIR" = "si" ]; then
+            opciones="$opciones --clean --if-exists"
+          fi
+          pg_restore $opciones --dbname="$DESTINO" "$copia"
+          rm -f "$copia"
+          echo "Copia terminada."
+
+      - name: Comparar filas tabla por tabla
+        run: |
+          consulta="select table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE' order by 1"
+          diferencias=0
+          printf "%-40s %10s %10s\n" "Tabla" "Render" "Neon"
+          for tabla in $(psql "$ORIGEN" -At -c "$consulta"); do
+            a=$(psql "$ORIGEN" -At -c "select count(*) from public.\"$tabla\"")
+            b=$(psql "$DESTINO" -At -c "select count(*) from public.\"$tabla\"" 2>/dev/null || echo "falta")
+            marca=""
+            if [ "$a" != "$b" ]; then marca="  <-- distinto"; diferencias=$((diferencias + 1)); fi
+            printf "%-40s %10s %10s%s\n" "$tabla" "$a" "$b" "$marca"
+          done
+          if [ "$diferencias" -gt 0 ]; then
+            echo "::error::$diferencias tablas no coinciden."
+            exit 1
+          fi
+          echo "Todas las tablas coinciden."
