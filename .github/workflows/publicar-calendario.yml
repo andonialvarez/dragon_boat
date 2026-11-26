@@ -1,16 +1,22 @@
 name: Publicar calendario
 
-# Envía a la web los eventos y resultados de calendario/datos.json.
-# - La tarea programada de cada lunes deja el fichero en la rama `calendario-semanal`.
-# - Si el fichero cambia en main (por ejemplo, la carga inicial), también se publica;
+# Envía a la web los eventos y resultados de calendario/*.json.
+# - La tarea programada de cada lunes deja calendario/datos.json en la rama `calendario-semanal`.
+# - Si un fichero de calendario/ cambia en main (la carga inicial, un borrador de calendario
+#   como borrador-rfep-2027.json...), se publica solo ese fichero;
 #   el script espera a que Render termine de desplegar la versión nueva.
+# - A mano (Run workflow) se publica calendario/datos.json, o el fichero que se indique.
 # Necesita el secreto NEWS_API_TOKEN (el mismo que usan las noticias).
 
 on:
   push:
     branches: [calendario-semanal, main]
-    paths: [calendario/datos.json]
+    paths: ["calendario/*.json"]
   workflow_dispatch:
+    inputs:
+      fichero:
+        description: "Fichero que se publica (dentro de calendario/)"
+        default: datos.json
 
 concurrency:
   group: publicar-calendario
@@ -22,6 +28,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -29,10 +37,15 @@ jobs:
         env:
           SITE_URL: ${{ vars.SITE_URL || 'https://dragon-boat-s7go.onrender.com' }}
           NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
+          FICHERO: ${{ inputs.fichero }}
         run: |
-          if [ ! -f calendario/datos.json ]; then
-            echo "No hay calendario/datos.json en esta rama: nada que publicar."
-            exit 0
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            files="calendario/$FICHERO"
+          else
+            # Solo los ficheros que han cambiado en este envío; así no se vuelven a
+            # publicar datos viejos encima de cambios que hizo la tarea semanal.
+            files=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'calendario/*.json' 2>/dev/null) \
+              || files="calendario/datos.json"
           fi
           if [ -z "$NEWS_API_TOKEN" ]; then
             echo "::error::Falta el secreto NEWS_API_TOKEN en GitHub (Settings > Secrets and variables > Actions)."
@@ -40,4 +53,13 @@ jobs:
           fi
           # El plan gratuito de Render «se duerme»: primero se despierta la web.
           curl --silent --output /dev/null --retry 5 --retry-delay 15 --retry-all-errors --max-time 120 "${SITE_URL%/}/robots.txt" || true
-          python scripts/publicar_calendario.py calendario/datos.json
+          status=0
+          for file in $files; do
+            if [ ! -f "$file" ]; then
+              echo "No hay $file en esta rama: nada que publicar."
+              continue
+            fi
+            echo "== Publicando $file"
+            python scripts/publicar_calendario.py "$file" || status=1
+          done
+          exit $status

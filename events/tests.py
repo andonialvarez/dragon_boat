@@ -256,6 +256,28 @@ class CalendarApiTests(TestCase):
 
         from django.conf import settings
 
-        data = json.loads((Path(settings.BASE_DIR) / "calendario" / "datos.json").read_text(encoding="utf-8"))
-        response = self.post(data)
-        self.assertEqual(response.status_code, 200, response.content)
+        for path in sorted((Path(settings.BASE_DIR) / "calendario").glob("*.json")):
+            with self.subTest(fichero=path.name):
+                data = json.loads(path.read_text(encoding="utf-8"))
+                response = self.post(data)
+                self.assertEqual(response.status_code, 200, response.content)
+
+    def test_provisional_events_are_marked(self):
+        payload = {
+            "eventos": [
+                {
+                    "ref": "borrador-1",
+                    "title": "Copa de prueba",
+                    "sport": "dragon-boat",
+                    "status": "provisional",
+                    "start_date": "2099-04-03",
+                    "source_url": "https://example.com/calendario",
+                }
+            ]
+        }
+        self.assertEqual(self.post(payload).status_code, 200)
+        event = Event.objects.get(external_ref="borrador-1")
+        self.assertEqual(event.status, Event.Status.PROVISIONAL)
+        self.assertContains(self.client.get(reverse("event_list")), "Fechas provisionales")
+        self.assertContains(self.client.get(reverse("event_detail", args=[event.slug])), "Fechas provisionales")
+        self.assertContains(self.client.get(reverse("event_ics", args=[event.slug])), "STATUS:TENTATIVE")

@@ -17,7 +17,7 @@ import urllib.request
 
 SPORTS = {"dragon-boat", "traineras", "piraguismo", "remo-olimpico", "vaa"}
 KINDS = {"regata", "campeonato", "liga", "festival", "travesia", "formacion", "otro"}
-STATUSES = {"programado", "aplazado", "cancelado"}
+STATUSES = {"programado", "provisional", "aplazado", "cancelado"}
 SCOPES = {"local", "autonomico", "nacional", "internacional"}
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LIMITS = {"title": 180, "name": 180, "summary": 280, "source_name": 120, "city": 120, "venue": 180}
@@ -111,14 +111,17 @@ def request(url, data=None, token=""):
 
 
 def send(site, token, data):
-    """Envía el fichero; si la web aún no tiene la API (404) o no responde, espera y reintenta."""
+    """Envía el fichero; si la web aún no tiene la API (404), no responde o no está al día, espera y reintenta."""
     deadline = time.monotonic() + DEPLOY_WAIT_SECONDS
     while True:
         try:
             status, body = request(f"{site}/api/calendario/", data, token)
         except OSError as error:
             status, body = 0, str(error)
-        if status not in (0, 404, 502, 503) or time.monotonic() > deadline:
+        # Un valor «desconocido» que aquí ya se ha dado por bueno (p. ej. un estado nuevo)
+        # significa que la web aún tiene la versión anterior: también se espera.
+        stale = status == 400 and "desconocido" in body
+        if (status not in (0, 404, 502, 503) and not stale) or time.monotonic() > deadline:
             return status, body
         print(f"La web aún no está lista ({status or body}); reintento en 60 s…")
         time.sleep(60)
