@@ -213,7 +213,7 @@ El repositorio está listo para **[Render](https://render.com)** con el fichero 
 **Ten en cuenta:**
 
 - El plan gratuito de Render «duerme» la web tras 15 minutos sin visitas. Para evitarlo, un monitor gratuito de **[UptimeRobot](https://uptimerobot.com)** visita `/salud/` cada 5 minutos; esa ruta no toca la base de datos, así que Neon sí puede dormirse cuando no hay nadie y no gasta sus horas gratuitas.
-- La base de datos gratuita de Render caduca a los 30 días; por eso los datos están en Neon. Para pasar los datos de una base de datos a otra está el flujo `.github/workflows/copiar-base-datos.yml`, que compara después las filas de cada tabla.
+- La base de datos gratuita de Render caduca a los 30 días; por eso los datos están en Neon. Para pasar los datos de una base de datos a otra (otra región u otro proveedor) está el flujo `.github/workflows/copiar-base-datos.yml`, con los secretos `BD_ORIGEN` y `BD_DESTINO`; después compara las filas de cada tabla. Pon la base de datos en la misma región que la web (la de Render, por defecto Oregón): si están lejos, cada consulta cruza el océano y la web va lenta.
 - **Imágenes subidas** (fotos de noticias, eventos y foro): el disco de los servicios web se borra en cada despliegue. Para conservarlas, elige una de estas opciones:
   - Un **disco persistente** en Render (planes de pago): móntalo en `/var/data` y define `MEDIA_ROOT=/var/data/media` y `SERVE_MEDIA=true`.
   - Un almacenamiento compatible con S3 (Cloudflare R2, Backblaze B2, AWS S3): añade `django-storages[s3]` a `requirements.txt` y define las variables `AWS_*` de `.env.example`.
