@@ -35,7 +35,7 @@ jobs:
           python-version: "3.12"
       - name: Publicar en la web
         env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://dragonboat-ih42.onrender.com' }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://dragon-boat-s7go.onrender.com' }}
           NEWS_API_TOKEN: ${{ secrets.NEWS_API_TOKEN }}
           FICHERO: ${{ inputs.fichero }}
         run: |
