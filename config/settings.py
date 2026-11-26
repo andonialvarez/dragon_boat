@@ -113,12 +113,23 @@ WSGI_APPLICATION = "config.wsgi.application"
 # --- Base de datos ----------------------------------------------------------
 # Sin DATABASE_URL se usa SQLite (un fichero db.sqlite3), perfecto para local.
 # En producción define DATABASE_URL=postgres://usuario:clave@host:5432/nombre
+# (la web publicada usa Neon, con plan gratuito).
+
+# En Render, sin DATABASE_URL la web arrancaría con una base de datos vacía: mejor parar.
+if os.environ.get("RENDER") and not os.environ.get("DATABASE_URL"):
+    from django.core.exceptions import ImproperlyConfigured
+
+    raise ImproperlyConfigured("Falta la variable DATABASE_URL en Render (la dirección de la base de datos).")
+
+# Segundos que se reutiliza cada conexión. Con 0 se cierra al acabar cada visita,
+# así la base de datos gratuita de Neon puede dormirse cuando no hay nadie.
+DB_CONN_MAX_AGE = int(os.environ.get("DB_CONN_MAX_AGE", "0"))
 
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        conn_health_checks=True,
+        conn_max_age=DB_CONN_MAX_AGE,
+        conn_health_checks=DB_CONN_MAX_AGE > 0,
     )
 }
 

@@ -146,3 +146,22 @@ class CreateAdminCommandTests(TestCase):
         with self.assertRaises(CommandError):
             self.run_command(DJANGO_SUPERUSER_USERNAME="andoni", DJANGO_SUPERUSER_PASSWORD="1234")
         self.assertFalse(User.objects.exists())
+
+
+class HealthCheckTests(TestCase):
+    """La ruta que visita UptimeRobot no debe despertar la base de datos."""
+
+    def test_answers_without_touching_the_database(self):
+        with self.assertNumQueries(0):
+            response = self.client.get("/salud/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"ok\n")
+        self.assertIn("no-cache", response["Cache-Control"])
+
+    def test_head_requests_work_too(self):
+        with self.assertNumQueries(0):
+            response = self.client.head("/salud/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_only_reads(self):
+        self.assertEqual(self.client.post("/salud/").status_code, 405)
