@@ -65,7 +65,7 @@ jobs:
       - name: Copiar los datos
         run: |
           copia="$RUNNER_TEMP/copia.dump"
-          pg_dump "$ORIGEN" --format=custom --no-owner --no-privileges --schema=public --file="$copia"
+          pg_dump "$ORIGEN" --format=custom --no-owner --no-privileges --file="$copia"
           opciones="--no-owner --no-privileges --exit-on-error --single-transaction"
           if [ "$SOBRESCRIBIR" = "si" ]; then
             opciones="$opciones --clean --if-exists"
