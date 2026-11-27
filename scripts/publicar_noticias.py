@@ -111,7 +111,7 @@ def main(path):
     created = duplicated = failed = 0
     for item in items:
         payload = {key: item[key] for key in (*REQUIRED, "sport", "category", "image_url") if item.get(key)}
-        payload["origin"] = "ia"  # Se muestra como «Resumen con IA».
+        payload["origin"] = "ia"  # Resumen semanal (sin etiqueta visible en la web).
         status, body = request(f"{site}/api/noticias/", payload, token)
         if status == 201:
             created += 1

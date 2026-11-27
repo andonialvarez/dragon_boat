@@ -24,7 +24,7 @@ class Article(SampleFlagMixin, TimeStampedMixin):
         EDITORIAL = "redaccion", _("Redacción")
         COMMUNITY = "comunidad", _("Comunidad")
         IMPORTED = "importada", _("De otra web")
-        AI = "ia", _("Resumen con IA")
+        AI = "ia", _("Resumen semanal")
 
     class Category(models.TextChoices):
         COMPETITION = "competicion", _("Competición")
