@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 
 # Palabras que ya usan las URLs (p. ej. /noticias/publicar/) y no pueden ser slugs.
-RESERVED_SLUGS = {"publicar", "rss", "comentarios", "editar", "borrar", "tema", "mensaje"}
+RESERVED_SLUGS = {"publicar", "buzon", "rss", "comentarios", "editar", "borrar", "tema", "mensaje"}
 
 
 def unique_slugify(instance, value, slug_field_name="slug"):

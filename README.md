@@ -118,6 +118,7 @@ python manage.py runserver
 ### Lo que puede hacer cualquier persona registrada
 
 - **Publicar noticias** (Noticias › «Publicar noticia») y **eventos o regatas** (Eventos › «Publicar evento»). Se publican al momento y llevan la etiqueta «Comunidad». Cada persona puede editar o borrar lo suyo.
+- **Dejar noticias en el buzón** (Noticias › «Buzón de noticias», `/noticias/buzon/`): se pega un enlace o se sube un documento (PDF, Word .docx, OpenDocument .odt o texto) y la web comprueba si esa noticia ya está publicada, primero por el enlace (sin www., parámetros `utm_*`, barra final…, y también la dirección canónica de la página) y luego por el titular (sin tildes ni palabras vacías; si los años no coinciden no se dan por iguales). Si ya existe, enseña la noticia que tenemos. Si es nueva, prepara el título, la entradilla, el deporte y la foto de la fuente para que la persona lo revise y la publique. Los enlaces se publican como las demás noticias de otras webs (titular, resumen y botón a la original); los documentos, como noticia de la comunidad con su texto. Los documentos no se guardan, solo su texto. Cada aportación queda en el panel, en «Buzón de noticias».
 - **Comentar** las noticias, **responder** a otros comentarios y **reaccionar**.
 - **Abrir temas y responder en el foro**, con una imagen opcional.
 

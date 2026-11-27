@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Buzón de noticias" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card wide">
+    <nav class="breadcrumbs"><a href="{% url 'tip_box' %}">← {% translate "Buzón de noticias" %}</a></nav>
+    <h1>📮 {% translate "Buzón de noticias" %}</h1>
+    <p class="tip-origin small muted">
+      {% if tip.kind == "enlace" %}🔗 <a href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.url|truncatechars:80 }}</a>{% else %}📄 {{ tip.file_name }}{% endif %}
+    </p>
+
+    {% if tip.status == "publicada" or tip.status == "pendiente" %}
+      <div class="notice">
+        {% if tip.status == "publicada" %}✅ {% translate "Esta aportación ya se ha publicado." %}{% else %}⏳ {% translate "Esta aportación está pendiente de revisión." %}{% endif %}
+        {% if tip.article %}<a href="{{ tip.article.get_absolute_url }}">{{ tip.article.title }}</a>{% endif %}
+      </div>
+    {% elif tip.status == "repetida" %}
+      <div class="tip-result tip-repeated">
+        <p class="tip-result-head">👍 {% if tip.match_kind == "enlace" %}{% translate "Esta noticia ya está en la web." %}{% else %}{% translate "Parece que esta noticia ya está en la web." %}{% endif %}</p>
+        {% if tip.article %}
+          <p>{% if tip.article.is_published %}<a href="{{ tip.article.get_absolute_url }}">{{ tip.article.title }}</a>{% else %}«{{ tip.article.title }}» <span class="muted">({% translate "pendiente de revisión" %})</span>{% endif %}
+          <span class="small muted">· {{ tip.article.published_at|date:"j \d\e F \d\e Y" }}</span></p>
+        {% endif %}
+        <p class="small muted">{% translate "Gracias igualmente: así sabemos que interesa." %}</p>
+        <div class="form-actions">
+          <a class="btn btn-secondary" href="{% url 'tip_box' %}">{% translate "Mandar otra" %}</a>
+        </div>
+      </div>
+    {% else %}
+      <div class="tip-result tip-new">
+        <p class="tip-result-head">✨ {% if tip.title %}{% translate "No la tenemos todavía." %}{% else %}{% translate "Escribe el titular y lo comprobamos al publicar." %}{% endif %}</p>
+        <p class="small muted">{% translate "Revisa lo que hemos sacado, corrige lo que haga falta y publícala." %}</p>
+      </div>
+    {% endif %}
+
+    {% if matches %}
+      <div class="notice warn">
+        <p><strong>{% translate "Se parecen a estas noticias que ya tenemos:" %}</strong></p>
+        <ul class="tip-matches">
+          {% for match in matches %}
+            <li>{% if match.article.is_published %}<a href="{{ match.article.get_absolute_url }}">{{ match.article.title }}</a>{% else %}{{ match.article.title }}{% endif %}</li>
+          {% endfor %}
+        </ul>
+        <p class="small">{% translate "Si es la misma, no hace falta publicarla otra vez." %}</p>
+      </div>
+    {% endif %}
+
+    {% if tip.is_open %}
+      {% if tip.status == "repetida" %}<details class="tip-anyway"{% if form.errors %} open{% endif %}><summary>{% translate "No es la misma: quiero publicarla" %}</summary>{% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if tip.status == "repetida" or matches %}<input type="hidden" name="confirmar" value="1">{% endif %}
+        {% include "includes/form_errors.html" %}
+        {% if tip.image_url %}
+          <figure class="tip-photo"><img src="{{ tip.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"><figcaption class="small muted">{% translate "Foto de la fuente (se mostrará con su crédito)" %}</figcaption></figure>
+        {% endif %}
+        <div class="form-grid">
+          {% include "includes/field.html" with field=form.sport %}
+          {% include "includes/field.html" with field=form.category %}
+        </div>
+        {% include "includes/field.html" with field=form.title %}
+        {% include "includes/field.html" with field=form.summary %}
+        {% if form.body %}{% include "includes/field.html" with field=form.body %}{% endif %}
+        {% include "includes/field.html" with field=form.source_name %}
+        {% if tip.kind == "enlace" %}
+          <p class="small muted">{% translate "Se publicará el titular y la entradilla, con un botón a la noticia completa en su web." %}</p>
+        {% endif %}
+        <p class="small muted">{% translate "Al publicar aceptas las normas de la comunidad." %} <a href="{% url 'rules' %}">{% translate "Normas" %}</a></p>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">{% translate "Publicar" %}</button>
+          <a href="{% url 'tip_box' %}">{% translate "Dejarlo" %}</a>
+        </div>
+      </form>
+      {% if tip.status == "repetida" %}</details>{% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

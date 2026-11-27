@@ -6,4 +6,5 @@ dj-database-url>=2.2        # Lee la base de datos de la variable DATABASE_URL
 psycopg[binary]>=3.2        # PostgreSQL (producción)
 python-dotenv>=1.0          # Lee el fichero .env en local
 feedparser>=6.0             # Importador de noticias RSS/Atom
+pypdf>=5.0                  # Lee el texto de los PDF del buzón de noticias
 gunicorn>=23.0; sys_platform != "win32"   # Servidor web en producción (Linux)

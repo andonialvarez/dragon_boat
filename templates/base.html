@@ -56,6 +56,7 @@
             <div class="menu">
               <a href="{% url 'profile_detail' user.get_username %}">{% translate "Mi perfil" %}</a>
               <a href="{% url 'article_create' %}">📰 {% translate "Publicar noticia" %}</a>
+              <a href="{% url 'tip_box' %}">📮 {% translate "Buzón de noticias" %}</a>
               <a href="{% url 'event_create' %}">📅 {% translate "Publicar evento" %}</a>
               <a href="{% url 'profile_edit' %}">{% translate "Editar perfil" %}</a>
               <a href="{% url 'password_change' %}">{% translate "Cambiar contraseña" %}</a>
@@ -113,6 +114,7 @@
         <h2>{% translate "Comunidad" %}</h2>
         <ul>
           <li><a href="{% url 'forum:index' %}">{% translate "Foro" %}</a></li>
+          <li><a href="{% url 'tip_box' %}">{% translate "Buzón de noticias" %}</a></li>
           <li><a href="{% url 'rules' %}">{% translate "Normas" %}</a></li>
           <li><a href="{% url 'article_feed' %}">RSS</a></li>
         </ul>
@@ -149,6 +151,7 @@
            data-reaccionar="{% translate 'Para reaccionar necesitas una cuenta.' %}"
            data-nuevo-tema="{% translate 'Para abrir un tema en el foro necesitas una cuenta.' %}"
            data-publicar-noticia="{% translate 'Para publicar una noticia necesitas una cuenta.' %}"
+           data-buzon="{% translate 'Para dejar algo en el buzón de noticias necesitas una cuenta.' %}"
            data-publicar-evento="{% translate 'Para publicar un evento necesitas una cuenta.' %}">{% translate "Para participar necesitas una cuenta." %}</p>
         <p class="join-note">{% translate "Leer es libre. Registrarse es gratis, se tarda un minuto y no hace falta confirmar el email." %}</p>
         <div class="join-actions">

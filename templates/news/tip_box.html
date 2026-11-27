@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Buzón de noticias" %}{% endblock %}
+{% block content %}
+<div class="wrap page">
+  <div class="panel form-card wide">
+    <nav class="breadcrumbs"><a href="{% url 'article_list' %}">← {% translate "Noticias" %}</a></nav>
+    <h1>📮 {% translate "Buzón de noticias" %}</h1>
+    <p class="muted">{% translate "¿Has visto una noticia de remo o pala que no está aquí? ¿Tu club ha sacado una nota de prensa? Déjala en el buzón." %}</p>
+    <ol class="tip-steps">
+      <li><strong>{% translate "Pega el enlace o sube el documento." %}</strong> {% translate "Puede ser de un periódico, de la web de un club o de una federación." %}</li>
+      <li><strong>{% translate "Comprobamos si ya la tenemos." %}</strong> {% translate "Miramos el enlace y el titular de las noticias publicadas." %}</li>
+      <li><strong>{% translate "Si es nueva, la revisas y se publica" %}</strong> {% translate "con tu nombre y citando siempre su fuente." %}</li>
+    </ol>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% include "includes/form_errors.html" %}
+      {% include "includes/field.html" with field=form.url %}
+      {% include "includes/field.html" with field=form.document %}
+      {% include "includes/field.html" with field=form.comment %}
+      <p class="small muted">{% translate "El documento no se guarda: leemos su texto para preparar la noticia y después se descarta." %}</p>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% translate "Comprobar" %}</button>
+        <a href="{% url 'article_list' %}">{% translate "Cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+
+  {% if tips %}
+    <section class="panel form-card wide tip-history">
+      <h2>{% translate "Lo último que has mandado" %}</h2>
+      <ul class="tip-list">
+        {% for tip in tips %}
+          <li>
+            <span class="badge tip-status {{ tip.status }}">{{ tip.get_status_display }}</span>
+            {% if tip.article and tip.article.is_published %}
+              <a href="{{ tip.article.get_absolute_url }}">{{ tip.article.title }}</a>
+            {% elif tip.is_open %}
+              <a href="{{ tip.get_absolute_url }}">{{ tip.title|default:tip.url|default:tip.file_name }}</a>
+            {% else %}
+              <span>{{ tip.title|default:tip.url|default:tip.file_name }}</span>
+            {% endif %}
+            <span class="small muted">· {{ tip.created_at|date:"j M" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}
