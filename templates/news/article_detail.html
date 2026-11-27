@@ -16,7 +16,7 @@
           {% include "includes/sample_badge.html" with obj=article %}
           {% if article.sport %}<span class="chip" style="--sport: {{ article.sport.color }}">{{ article.sport.icon }} {{ article.sport.name }}</span>{% endif %}
           <span class="badge">{{ article.get_category_display }}</span>
-          {% if article.origin != "redaccion" %}<span class="badge origin-badge {{ article.origin }}">{{ article.get_origin_display }}</span>{% endif %}
+          {% if article.origin != "redaccion" and article.origin != "ia" %}<span class="badge origin-badge {{ article.origin }}">{{ article.get_origin_display }}</span>{% endif %}
           {% if article.status == "pendiente" %}<span class="badge badge-red">{% translate "Pendiente de revisión" %}</span>{% elif not article.is_published %}<span class="badge badge-red">{% translate "Borrador" %}</span>{% endif %}
         </div>
         <h1>{{ article.title }}</h1>
@@ -60,9 +60,6 @@
         </div>
       {% else %}
         <div class="prose">{{ article.body|urlize|linebreaks }}</div>
-        {% if article.origin == "ia" %}
-          <p class="small muted">🤖 {% translate "Resumen elaborado automáticamente con IA a partir de la fuente citada. Si ves un error, avísanos en el foro." %}</p>
-        {% endif %}
       {% endif %}
 
       {% if not article.is_external and article.source_name or not article.is_external and article.source_url %}

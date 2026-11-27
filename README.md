@@ -155,7 +155,7 @@ Los **deportes** (dragon boat, traineras, piragüismo, remo olímpico, va'a) y l
 
 ## Noticias automáticas
 
-Hay dos caminos, que se pueden usar a la vez. Cada noticia indica su origen («De otra web», «Resumen con IA», «Comunidad»...).
+Hay dos caminos, que se pueden usar a la vez. Cada noticia indica su origen («De otra web», «Comunidad»...); los resúmenes semanales no llevan etiqueta.
 
 ### 1. Importador de titulares RSS
 

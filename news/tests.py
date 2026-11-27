@@ -349,6 +349,24 @@ class ApiTests(TestCase):
         self.assertEqual(response.json()["created"], 0)
 
 
+class NoAiLabelTests(TestCase):
+    def test_weekly_summary_shows_no_ai_label(self):
+        article = Article.objects.create(
+            title="Regata de prueba",
+            summary="Resumen.",
+            body="Texto del resumen.",
+            origin=Article.Origin.AI,
+            status=Article.Status.PUBLISHED,
+            source_name="Medio",
+            source_url="https://medio.example.com/regata",
+        )
+        for url in (reverse("article_list"), article.get_absolute_url(), reverse("about")):
+            html = self.client.get(url).content.decode()
+            self.assertNotIn("con IA", html)
+            self.assertNotIn("inteligencia artificial", html)
+            self.assertNotIn("🤖", html)
+
+
 class EventLinkTests(TestCase):
     def test_article_shows_related_event(self):
         event = Event.objects.create(
