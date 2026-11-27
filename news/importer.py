@@ -92,6 +92,8 @@ def fetch(url):
 
 def import_source(source, content=None, now=None):
     """Importa una fuente. `content` permite pasar el XML directamente (pruebas)."""
+    from .buzon import normalize_url
+
     now = now or timezone.now()
     raw = content if content is not None else fetch(source.feed_url)
     parsed = feedparser.parse(raw)
@@ -129,7 +131,7 @@ def import_source(source, content=None, now=None):
             continue
         published_at = min(published_at, now)
 
-        if Article.objects.filter(source_url=link).exists():
+        if Article.objects.filter(source_key=normalize_url(link)).exists():
             skipped += 1
             continue
 

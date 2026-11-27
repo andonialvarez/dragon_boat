@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 
 from core.admin import SampleListFilter
 
-from .models import Article, Comment, NewsSource
+from .models import Article, Comment, NewsSource, NewsTip
 
 
 @admin.register(Article)
@@ -79,3 +79,13 @@ class NewsSourceAdmin(admin.ModelAdmin):
 
         report = import_from_sources(queryset)
         self.message_user(request, report.summary(), messages.WARNING if report.errors else messages.SUCCESS)
+
+
+@admin.register(NewsTip)
+class NewsTipAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "kind", "status", "match_kind", "user", "created_at")
+    list_filter = ("status", "kind", "match_kind")
+    search_fields = ("title", "url", "file_name", "user__username")
+    date_hierarchy = "created_at"
+    raw_id_fields = ("user", "article")
+    readonly_fields = ("url_keys", "match_score", "created_at")

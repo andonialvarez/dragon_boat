@@ -24,6 +24,7 @@ from django.views.decorators.http import require_POST
 
 from core.models import Sport
 
+from .buzon import normalize_url
 from .images import clean_image_url, fill_missing_images, find_image
 from .importer import import_from_sources
 from .models import Article, NewsSource
@@ -68,7 +69,7 @@ def create_article(request):
         source_url = (payload.get("source_url") or "").strip()
         if source_url:
             URLValidator(schemes=["http", "https"])(source_url)
-            existing = Article.objects.filter(source_url=source_url).first()
+            existing = Article.objects.filter(source_key=normalize_url(source_url)).first()
             if existing:
                 return JsonResponse(
                     {

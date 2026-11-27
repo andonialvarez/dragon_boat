@@ -77,6 +77,14 @@ class Article(SampleFlagMixin, TimeStampedMixin):
     )
     source_name = models.CharField(_("fuente"), max_length=120, blank=True)
     source_url = models.URLField(_("enlace a la fuente"), max_length=600, blank=True, db_index=True)
+    source_key = models.CharField(
+        _("enlace normalizado"),
+        max_length=600,
+        blank=True,
+        db_index=True,
+        editable=False,
+        help_text=_("El enlace a la fuente sin www., parámetros de seguimiento ni barra final. Sirve para detectar repetidas."),
+    )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("autor"),
@@ -127,6 +135,11 @@ class Article(SampleFlagMixin, TimeStampedMixin):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slugify(self, self.title)
+        from .buzon import normalize_url
+
+        self.source_key = normalize_url(self.source_url)
+        if kwargs.get("update_fields") is not None and "source_url" in kwargs["update_fields"]:
+            kwargs["update_fields"] = {*kwargs["update_fields"], "source_key"}
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -239,3 +252,80 @@ class NewsSource(models.Model):
 
     def keyword_list(self):
         return [word.strip().lower() for word in self.keywords.split(",") if word.strip()]
+
+
+class NewsTip(models.Model):
+    """Lo que un usuario deja en el buzón de noticias: un enlace o un documento.
+
+    El documento no se guarda; solo el texto que se ha sacado de él, y únicamente
+    mientras la aportación está a medias (luego pasa a la noticia o se borra).
+    """
+
+    class Kind(models.TextChoices):
+        LINK = "enlace", _("Enlace")
+        DOCUMENT = "documento", _("Documento")
+
+    class Status(models.TextChoices):
+        DRAFT = "borrador", _("Sin terminar")
+        DUPLICATE = "repetida", _("Ya estaba publicada")
+        PUBLISHED = "publicada", _("Publicada")
+        PENDING = "pendiente", _("Pendiente de revisión")
+
+    class MatchKind(models.TextChoices):
+        NONE = "", _("Ninguna")
+        LINK = "enlace", _("Mismo enlace")
+        TITLE = "titulo", _("Título casi igual")
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_("usuario"), on_delete=models.CASCADE, related_name="news_tips"
+    )
+    kind = models.CharField(_("tipo"), max_length=10, choices=Kind.choices)
+    url = models.URLField(_("enlace"), max_length=600, blank=True)
+    url_keys = models.CharField(
+        _("enlaces normalizados"), max_length=1900, blank=True, help_text=_("Separados por espacios.")
+    )
+    file_name = models.CharField(_("documento"), max_length=150, blank=True)
+    comment = models.CharField(_("comentario del usuario"), max_length=500, blank=True)
+    title = models.CharField(_("título"), max_length=200, blank=True)
+    summary = models.CharField(_("entradilla"), max_length=320, blank=True)
+    body = models.TextField(_("texto"), blank=True)
+    source_name = models.CharField(_("fuente"), max_length=120, blank=True)
+    image_url = models.URLField(_("imagen de la fuente"), max_length=600, blank=True)
+    original_published_at = models.DateTimeField(_("fecha en la fuente"), null=True, blank=True)
+    sport = models.ForeignKey(
+        "core.Sport", verbose_name=_("deporte"), on_delete=models.SET_NULL, null=True, blank=True
+    )
+    status = models.CharField(_("estado"), max_length=10, choices=Status.choices, default=Status.DRAFT)
+    match_kind = models.CharField(_("coincidencia"), max_length=10, choices=MatchKind.choices, blank=True)
+    match_score = models.FloatField(_("parecido"), null=True, blank=True)
+    article = models.ForeignKey(
+        Article,
+        verbose_name=_("noticia"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tips",
+        help_text=_("La noticia que ya existía o la que se ha creado con esta aportación."),
+    )
+    created_at = models.DateTimeField(_("fecha"), default=timezone.now, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = _("aportación al buzón")
+        verbose_name_plural = _("buzón de noticias")
+
+    def __str__(self):
+        return self.title or self.url or self.file_name or f"#{self.pk}"
+
+    def get_absolute_url(self):
+        return reverse("tip_review", args=[self.pk])
+
+    def key_list(self):
+        return [key for key in self.url_keys.split() if key]
+
+    @property
+    def is_open(self):
+        """Todavía se puede terminar (no hay noticia creada y no es un enlace repetido)."""
+        return self.status == self.Status.DRAFT or (
+            self.status == self.Status.DUPLICATE and self.match_kind == self.MatchKind.TITLE
+        )
